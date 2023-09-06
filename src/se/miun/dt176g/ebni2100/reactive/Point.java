@@ -1,7 +1,5 @@
 package se.miun.dt176g.ebni2100.reactive;
 
-
-
 /**
  * <h1>Point</h1>
  *

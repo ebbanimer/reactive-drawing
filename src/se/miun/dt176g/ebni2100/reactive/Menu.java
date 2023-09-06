@@ -26,6 +26,10 @@ public class Menu extends JMenuBar {
     private void init(MainFrame frame) {
 
         // ------------- MENUS
+
+        JMenu menuOptions;
+        JMenuItem menuOptionItem;
+
         JMenu menuShape;
         JMenuItem menuShapeItem;
 
@@ -34,6 +38,9 @@ public class Menu extends JMenuBar {
 
         JMenu menuThickness;
         JMenuItem menuThicknessItem;
+
+        menuOptions = new JMenu("Options");
+        this.add(menuOptions);
 
         menuShape = new JMenu("Shapes");
         this.add(menuShape);
@@ -45,6 +52,12 @@ public class Menu extends JMenuBar {
         this.add(menuThickness);
 
         // ------------- MENU-ITEMS
+
+        // OPTIONS
+        menuOptionItem = new JMenuItem("Clear");
+        menuOptionItem.addActionListener(e -> anEvent(frame));
+        menuOptions.add(menuOptionItem);
+
 
         // SHAPES
         menuShapeItem = new JMenuItem("Rectangle");
@@ -84,7 +97,7 @@ public class Menu extends JMenuBar {
         menuThicknessItem  = new JMenuItem("Bold");
         menuThicknessItem .addActionListener(e ->  anotherEvent(frame));
         menuThickness.add(menuThicknessItem );
-        
+
 
     }
 
