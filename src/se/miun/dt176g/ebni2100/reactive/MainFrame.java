@@ -8,7 +8,7 @@ import javax.swing.*;
  * <h1>MainFrame</h1>
  * JFrame to contain the rest
  *
- * @author 	--YOUR NAME HERE--
+ * @author 	Ebba Nimér
  * @version 1.0
  * @since 	2022-09-08
  */

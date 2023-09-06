@@ -10,7 +10,7 @@ import javax.swing.JOptionPane;
 /**
  * <h1>Menu</h1>
  *
- * @author 	--YOUR NAME HERE--
+ * @author 	Ebba Nimér
  * @version 1.0
  * @since 	2022-09-08
  */
@@ -25,20 +25,67 @@ public class Menu extends JMenuBar {
 
     private void init(MainFrame frame) {
 
-        JMenu menu;
-        JMenuItem menuItem;
+        // ------------- MENUS
+        JMenu menuShape;
+        JMenuItem menuShapeItem;
 
-        menu = new JMenu("Some Menu category");
-        this.add(menu);
+        JMenu menuColor;
+        JMenuItem menuColorItem;
 
+        JMenu menuThickness;
+        JMenuItem menuThicknessItem;
 
-        menuItem = new JMenuItem("Some menu item 1");
-        menuItem.addActionListener(e -> anEvent(frame));
-        menu.add(menuItem);
+        menuShape = new JMenu("Shapes");
+        this.add(menuShape);
 
-        menuItem = new JMenuItem("Some menu item 2");
-        menuItem.addActionListener(e ->  anotherEvent(frame));
-        menu.add(menuItem);
+        menuColor = new JMenu("Color");
+        this.add(menuColor);
+
+        menuThickness = new JMenu("Thickness");
+        this.add(menuThickness);
+
+        // ------------- MENU-ITEMS
+
+        // SHAPES
+        menuShapeItem = new JMenuItem("Rectangle");
+        menuShapeItem.addActionListener(e -> anEvent(frame));
+        menuShape.add(menuShapeItem);
+
+        menuShapeItem = new JMenuItem("Oval");
+        menuShapeItem.addActionListener(e ->  anotherEvent(frame));
+        menuShape.add(menuShapeItem);
+
+        menuShapeItem = new JMenuItem("Straight Line");
+        menuShapeItem.addActionListener(e ->  anotherEvent(frame));
+        menuShape.add(menuShapeItem);
+
+        menuShapeItem = new JMenuItem("Freehand");
+        menuShapeItem.addActionListener(e ->  anotherEvent(frame));
+        menuShape.add(menuShapeItem);
+
+        // COLOR
+        menuColorItem = new JMenuItem("Blue");
+        menuColorItem.addActionListener(e ->  anotherEvent(frame));
+        menuColor.add(menuColorItem);
+
+        menuColorItem = new JMenuItem("Red");
+        menuColorItem.addActionListener(e ->  anotherEvent(frame));
+        menuColor.add(menuColorItem);
+
+        // THICKNESS
+        menuThicknessItem = new JMenuItem("Thin");
+        menuThicknessItem .addActionListener(e ->  anotherEvent(frame));
+        menuThickness.add(menuThicknessItem );
+
+        menuThicknessItem  = new JMenuItem("Medium");
+        menuThicknessItem .addActionListener(e ->  anotherEvent(frame));
+        menuThickness.add(menuThicknessItem );
+
+        menuThicknessItem  = new JMenuItem("Bold");
+        menuThicknessItem .addActionListener(e ->  anotherEvent(frame));
+        menuThickness.add(menuThicknessItem );
+        
+
     }
 
     private void anEvent(MainFrame frame) {

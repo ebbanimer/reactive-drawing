@@ -8,7 +8,7 @@ import javax.swing.*;
  * <h1>DrawingPanel</h1> Creates a Canvas-object for displaying all graphics
  * already drawn.
  *
- * @author 	--YOUR NAME HERE--
+ * @author 	Ebba Nimér
  * @version 1.0
  * @since 	2022-09-08
  */
