@@ -6,6 +6,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import se.miun.dt176g.ebni2100.reactive.Shapes.Rectangle;
 
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
@@ -26,6 +27,7 @@ public class DrawingPanel extends JPanel {
     private Drawing drawing;
     private Point startPoint;
     private Point currentPoint;
+    private Point endPoint;
     private Observable<MouseEvent> mouseEventObservable;
     private Disposable mouseEventDisposable;
 
@@ -33,6 +35,9 @@ public class DrawingPanel extends JPanel {
     private Color currentColor; // Store the selected color
     private int currentThickness; // Store the selected thickness
 
+    private Disposable mousePressDisposable;
+    private Disposable mouseDragDisposable;
+    private Disposable mouseReleaseDisposable;
 
     /*private final Point mousePoint;
     int pointSize;
@@ -47,15 +52,20 @@ public class DrawingPanel extends JPanel {
         // Default values
         currentColor = Constants.COLOR_RED;
         currentThickness = Constants.MEDIUM;
-        currentShape = new Rectangle(0, 0, 0, 0, currentColor, currentThickness);
 
         drawing = new Drawing();
-        startPoint = new Point(0, 0);  // Initialize start point
         currentPoint = new Point(0, 0); // Initialize current point
+        currentShape = null; // Initialize the current shape to null
 
-        mouseEventObservable = Observable.create(emitter -> {
+        // Create Observables for mouse events using custom Point objects
+        Observable<Point> mousePressEventObservable = createMouseEventObservable(MouseEvent.MOUSE_PRESSED);
+        Observable<Point> mouseDragEventObservable = createMouseEventObservable(MouseEvent.MOUSE_DRAGGED);
+        Observable<Point> mouseReleaseEventObservable = createMouseEventObservable(MouseEvent.MOUSE_RELEASED);
 
-        });
+        // Subscribe to mouse events using chaining operators
+        mousePressDisposable = mousePressEventObservable.subscribe(this::onMousePressed);
+        mouseDragDisposable = mouseDragEventObservable.subscribe(this::onMouseDragged);
+        mouseReleaseDisposable = mouseReleaseEventObservable.subscribe(this::onMouseReleased);
 
         //mousePoint = new Point(0, 0);  // default values
         //pointSize = 7;   // default size (medium)
@@ -129,6 +139,52 @@ public class DrawingPanel extends JPanel {
     public Observable<MouseEvent> getMouseMotionObservable() {
         return mouseEventObservable;
     }*/
+
+    // Implement event handlers for mouse press, drag, and release
+    private void onMousePressed(Point point) {
+        // Handle mouse press event here
+        // Set the start point and create a new shape, e.g., currentShape = new Rectangle(...);
+        startPoint = new Point(point.x(), point.y());
+        currentShape = new Rectangle(startPoint.x(), startPoint.y(), 0, 0, currentColor, currentThickness);
+    }
+
+    private void onMouseDragged(Point point) {
+        // Handle mouse drag event here
+        // Update the shape's size or position using the provided Point
+        if (currentShape != null) { // Check if a shape is being resized
+            int newWidth = Math.abs(point.x() - currentShape.getX());
+            int newHeight = Math.abs(point.y() - currentShape.getY());
+            currentShape.setSize(newWidth, newHeight); // Update the size
+            repaint(); // Redraw the panel with the updated shape size
+        }
+    }
+
+    private void onMouseReleased(Point point) {
+        // Handle mouse release event here
+        // Finalize the shape's size or position using the provided Point
+        if (currentShape != null) {
+            // Finalize the resizing
+            // Add the finalized shape to your drawing container (e.g., drawing.addShape(currentShape))
+            currentShape = null; // Stop resizing by setting currentShape to null
+            repaint(); // Repaint to display the drawn shape
+        }
+    }
+
+    // Create an Observable for a specific mouse event type (press, drag, or release)
+    private Observable<Point> createMouseEventObservable(int mouseEventType) {
+        return Observable.create(emitter -> {
+            addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    // Emit Point objects for the specified mouse event type
+                    if (e.getID() == mouseEventType) {
+                        emitter.onNext(new Point(e.getX(), e.getY()));
+                    }
+                }
+            });
+        });
+    }
+
 
     public void redraw() {
         repaint();

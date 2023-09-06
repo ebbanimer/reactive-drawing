@@ -36,6 +36,11 @@ public abstract class Shape implements Drawable {
         this.thickness = thickness;
     }
 
+    public void setSize(int width, int height) {
+        this.width = width;
+        this.height = height;
+    }
+
     protected int getX(){
         return startX;
     }
