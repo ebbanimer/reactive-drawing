@@ -1,7 +1,6 @@
 package se.miun.dt176g.ebni2100.reactive;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.*;
 
 /**
  * <h1>ConcreteShape</h1> Creates a Circle-object.
@@ -15,6 +14,10 @@ import java.awt.Graphics2D;
  */
 
 public class ConcreteShape extends Shape {
+
+    public ConcreteShape(int x, int y, int width, int height, Color color, int thickness) {
+        super(x, y, width, height, color, thickness);
+    }
 
     @Override
     public void draw(Graphics g) {

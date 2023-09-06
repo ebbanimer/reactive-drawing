@@ -12,8 +12,52 @@ package se.miun.dt176g.ebni2100.reactive;
  * @since 	2022-09-08
  */
 
+import java.awt.*;
+
+/**
+ *
+ */
 public abstract class Shape implements Drawable {
 
     // private member : some container storing coordinates
+    private Color color;
+    private int thickness;
+    private int startX;
+    private int startY;
+    private int width;
+    private int height;
+
+    public Shape(int x, int y, int width, int height, Color color, int thickness) {
+        this.startX = x;
+        this.startY = y;
+        this.width = width;
+        this.height = height;
+        this.color = color;
+        this.thickness = thickness;
+    }
+
+    protected int getX(){
+        return startX;
+    }
+
+    protected int getY(){
+        return startY;
+    }
+
+    protected int getWidth(){
+        return width;
+    }
+
+    protected int getHeight(){
+        return height;
+    }
+
+    protected int getThickness(){
+        return thickness;
+    }
+
+    protected Color getColor(){
+        return color;
+    }
 
 }
