@@ -2,6 +2,7 @@ package se.miun.dt176g.ebni2100.reactive;
 
 
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.subjects.PublishSubject;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -21,11 +22,13 @@ public class Menu extends JMenuBar {
 
     private static final long serialVersionUID = 1L;
     private int thickness;
-    private Color color;
+    private Color currentColor;
     private final MainFrame frame;
 
-    private Observable<Integer> thicknessObservable;
     private Observable<Color> colorObservable;
+    private Observable<Integer> thicknessObservable;
+    private PublishSubject<Color> colorSubject = PublishSubject.create();
+    private PublishSubject<Integer> thicknessSubject = PublishSubject.create();
 
     public Menu(MainFrame frame) {
         this.frame = frame;
@@ -92,13 +95,21 @@ public class Menu extends JMenuBar {
 
         // COLOR
         menuColorItem = new JMenuItem(Constants.STRING_RED);
-        menuColorItem.addActionListener(e ->  anotherEvent(frame));
+        menuColorItem.addActionListener(e -> setColorObservable(Color.RED));
         menuColor.add(menuColorItem);
 
         menuColorItem = new JMenuItem(Constants.STRING_BLUE);
-        menuColorItem.addActionListener(e ->  anotherEvent(frame));
+        menuColorItem.addActionListener(e -> setColorObservable(Color.BLUE));
         menuColor.add(menuColorItem);
 
+    }
+
+    private void setColorObservable(Color selectedColor) {
+        colorSubject.onNext(selectedColor);
+    }
+
+    public Observable<Color> getColorObservable() {
+        return colorSubject;
     }
 
     private void setThicknessMenu(){
@@ -113,15 +124,12 @@ public class Menu extends JMenuBar {
 
         // THICKNESS
         thicknessSmallItem = new JMenuItem(Constants.STRING_SMALL);
-        thicknessSmallItem.addActionListener(e ->  anotherEvent(frame));
         menuThickness.add(thicknessSmallItem );
 
         thicknessMediumItem = new JMenuItem(Constants.STRING_MEDIUM);
-        thicknessSmallItem.addActionListener(e ->  anotherEvent(frame));
         menuThickness.add(thicknessMediumItem);
 
         thicknessBigItem = new JMenuItem(Constants.STRING_BIG);
-        thicknessSmallItem.addActionListener(e ->  anotherEvent(frame));
         menuThickness.add(thicknessBigItem);
 
         // Initialize observables
@@ -133,12 +141,13 @@ public class Menu extends JMenuBar {
         });
     }
 
-    public Observable<Integer> getThicknessObservable() {
-        return thicknessObservable;
+
+    private void setThicknessObservable(Integer thickness) {
+        thicknessSubject.onNext(thickness);
     }
 
-    public Observable<Color> getColorObservable() {
-        return colorObservable;
+    public Observable<Integer> getThicknessObservable() {
+        return thicknessObservable;
     }
 
 
@@ -154,14 +163,6 @@ public class Menu extends JMenuBar {
 
     private void anotherEvent(MainFrame frame) {
 
-    }
-
-    public Color getColor(){
-        return color;
-    }
-
-    public int getThickness(){
-        return thickness;
     }
 
 }

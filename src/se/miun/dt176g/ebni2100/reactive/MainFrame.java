@@ -18,6 +18,7 @@ public class MainFrame extends JFrame {
 
     private String header;
     private DrawingPanel drawingPanel;
+    private Menu menu;
 
     public MainFrame() {
 
@@ -33,11 +34,12 @@ public class MainFrame extends JFrame {
         this.setLayout(new BorderLayout());
 
         // Creates all necessary objects and adds them to the MainFrame (just one object right now)
-        drawingPanel = new DrawingPanel();
+        menu = new Menu(this);
+        drawingPanel = new DrawingPanel(menu);
         drawingPanel.setBounds(0, 0, getWidth(), getHeight());
         this.getContentPane().add(drawingPanel, BorderLayout.CENTER);
 
-        this.setJMenuBar(new Menu(this));
+        this.setJMenuBar(menu);
 
     }
 

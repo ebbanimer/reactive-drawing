@@ -3,8 +3,10 @@ package se.miun.dt176g.ebni2100.reactive;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.Disposable;
+import se.miun.dt176g.ebni2100.reactive.Shapes.Freehand;
 import se.miun.dt176g.ebni2100.reactive.Shapes.Oval;
 import se.miun.dt176g.ebni2100.reactive.Shapes.Rectangle;
+import se.miun.dt176g.ebni2100.reactive.Shapes.StraightLine;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -26,6 +28,7 @@ import javax.swing.*;
 public class DrawingPanel extends JPanel {
 
     private Drawing drawing;
+    private Menu menu;
     private Point startPoint;
     private Point currentPoint;
     private Point endPoint;
@@ -33,24 +36,38 @@ public class DrawingPanel extends JPanel {
     private Disposable mouseEventDisposable;
 
     private Shape currentShape; // Store the shape being drawn
-    private final Color currentColor; // Store the selected color
-    private final int currentThickness; // Store the selected thickness
+    private Color currentColor; // Store the selected color
+    private int currentThickness; // Store the selected thickness
 
     private Disposable mouseMotionDisposable;
     private Disposable mousePressDisposable;
     private Disposable mouseDragDisposable;
     private Disposable mouseReleaseDisposable;
+    private Disposable colorDisposable;
+    private Disposable thicknessDisposable;
 
-    public DrawingPanel() {
+    public DrawingPanel(Menu menu) {
 
         // Default values
         currentColor = Constants.COLOR_RED;
         currentThickness = Constants.MEDIUM;
 
         drawing = new Drawing();
+        this.menu = menu;
         startPoint = new Point(0, 0);  // Initialize start-point.
         currentPoint = new Point(0, 0); // Initialize current point
         currentShape = null; // Initialize the current shape to null
+
+        // Subscribe to the color observable to update the current color
+        colorDisposable = menu.getColorObservable().subscribe(selectedColor -> {
+            currentColor = selectedColor;
+            repaint(); // Redraw the panel with the updated color
+        });
+
+        thicknessDisposable = menu.getThicknessObservable().subscribe(selectedThickness -> {
+            currentThickness = selectedThickness;
+            repaint();
+        });
 
         mouseMotionDisposable = createMouseMotionObservable()
                 .map(event -> new Point(event.getX(), event.getY()))
@@ -67,24 +84,32 @@ public class DrawingPanel extends JPanel {
             int startY = event.getY();
             startPoint.x(startX);
             startPoint.y(startY);
-            currentShape = new Oval(startX, startY, 0, 0, currentColor, currentThickness);
+            currentShape = new StraightLine(startX, startY, 0, 0, currentColor, currentThickness);
             drawing.addShape(currentShape);
         });
 
         mouseDragDisposable = createMouseDragObservable().subscribe(event -> {
-            // Update the current shape's size or position using the provided MouseEvent
+            // Update the current line's position and size using the provided MouseEvent
             if (currentShape != null) {
-                int newX = Math.min(event.getX(), startPoint.x());
-                int newY = Math.min(event.getY(), startPoint.y());
-                int newWidth = Math.abs(event.getX() - startPoint.x());
-                int newHeight = Math.abs(event.getY() - startPoint.y());
+                if (currentShape instanceof Freehand) {
+                    Freehand freehand = (Freehand) currentShape;
+                    freehand.addPoint(new Point(event.getX(), event.getY()));
+                    repaint(); // Redraw the panel with the updated shape
+                } else {
+                    int newX = Math.min(event.getX(), startPoint.x());
+                    int newY = Math.min(event.getY(), startPoint.y());
+                    int newWidth = Math.abs(event.getX() - startPoint.x());
+                    int newHeight = Math.abs(event.getY() - startPoint.y());
 
-                currentShape.setPosition(newX, newY);
-                currentShape.setSize(newWidth, newHeight);
+                    currentShape.setPosition(newX, newY);
+                    currentShape.setSize(newWidth, newHeight);
 
-                repaint(); // Redraw the panel with the updated shape size
+                    repaint(); // Redraw the panel with the updated line position and size
+                }
+
             }
         });
+
 
 
     }
@@ -172,5 +197,6 @@ public class DrawingPanel extends JPanel {
         g2d.fillOval(x, y, currentThickness, currentThickness);
 
     }
+
 }
 

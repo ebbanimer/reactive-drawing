@@ -22,10 +22,11 @@ public class Rectangle extends Shape {
     @Override
     public void draw(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
-        g2.setColor(getColor()); // Set the color of the rectangle
+        g2.setColor(getColor()); // Set the color of the line
         g2.setStroke(new BasicStroke(getThickness())); // Set the line thickness
 
-        // Draw the rectangle using the inherited properties
+        // Draw the straight line using the inherited properties
         g2.drawRect(getX(), getY(), getWidth(), getHeight());
     }
+
 }
