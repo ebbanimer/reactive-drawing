@@ -7,8 +7,10 @@ public interface Constants {
     // Colors.
     Color COLOR_RED = new Color(255,0,0);
     Color COLOR_BLUE = new Color(0,0,255);
+    Color COLOR_GREEN = new Color(0,255,0);
     String STRING_RED = "Red";
     String STRING_BLUE = "Blue";
+    String STRING_GREEN = "Green";
 
     // Thickness.
     int SMALL = 2;
@@ -17,4 +19,10 @@ public interface Constants {
     String STRING_SMALL = "Small";
     String STRING_MEDIUM = "Medium";
     String STRING_BIG = "Big";
+
+    // Shapes
+    String RECTANGLE = "Rectange";
+    String OVAL = "Oval";
+    String STRAIGHT_LINE = "Straight Line";
+    String FREEHAND = "Freehand";
 }

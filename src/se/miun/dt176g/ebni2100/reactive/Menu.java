@@ -21,14 +21,12 @@ import java.awt.*;
 public class Menu extends JMenuBar {
 
     private static final long serialVersionUID = 1L;
-    private int thickness;
-    private Color currentColor;
     private final MainFrame frame;
 
     private Observable<Color> colorObservable;
     private Observable<Integer> thicknessObservable;
-    private PublishSubject<Color> colorSubject = PublishSubject.create();
-    private PublishSubject<Integer> thicknessSubject = PublishSubject.create();
+    private Observable<String> shapeObservable;
+
 
     public Menu(MainFrame frame) {
         this.frame = frame;
@@ -62,54 +60,69 @@ public class Menu extends JMenuBar {
     private void setShapeMenu(){
 
         JMenu menuShape;
-        JMenuItem menuShapeItem;
+        JMenuItem rectangleItem;
+        JMenuItem ovalItem;
+        JMenuItem lineItem;
+        JMenuItem freehandItem;
 
         menuShape = new JMenu("Shapes");
         this.add(menuShape);
 
         // SHAPES
-        menuShapeItem = new JMenuItem("Rectangle");
-        menuShapeItem.addActionListener(e -> anEvent(frame));
-        menuShape.add(menuShapeItem);
+        rectangleItem = new JMenuItem("Rectangle");
+        menuShape.add(rectangleItem);
 
-        menuShapeItem = new JMenuItem("Oval");
-        menuShapeItem.addActionListener(e ->  anotherEvent(frame));
-        menuShape.add(menuShapeItem);
+        ovalItem = new JMenuItem("Oval");
+        menuShape.add(ovalItem);
 
-        menuShapeItem = new JMenuItem("Straight Line");
-        menuShapeItem.addActionListener(e ->  anotherEvent(frame));
-        menuShape.add(menuShapeItem);
+        lineItem = new JMenuItem("Straight Line");
+        menuShape.add(lineItem);
 
-        menuShapeItem = new JMenuItem("Freehand");
-        menuShapeItem.addActionListener(e ->  anotherEvent(frame));
-        menuShape.add(menuShapeItem);
+        freehandItem = new JMenuItem("Freehand");
+        menuShape.add(freehandItem);
+
+        shapeObservable = Observable.create(emitter -> {
+            rectangleItem.addActionListener(e -> emitter.onNext(Constants.RECTANGLE));
+            ovalItem.addActionListener(e -> emitter.onNext(Constants.OVAL));
+            lineItem.addActionListener(e -> emitter.onNext(Constants.STRAIGHT_LINE));
+            freehandItem.addActionListener(e -> emitter.onNext(Constants.FREEHAND));
+        });
+    }
+
+    public Observable<String> getShapeObservable(){
+        return shapeObservable;
     }
 
     private void setColorMenu(){
 
         JMenu menuColor;
-        JMenuItem menuColorItem;
+        JMenuItem blueItem;
+        JMenuItem redItem;
+        JMenuItem greenItem;
 
         menuColor = new JMenu("Color");
         this.add(menuColor);
 
         // COLOR
-        menuColorItem = new JMenuItem(Constants.STRING_RED);
-        menuColorItem.addActionListener(e -> setColorObservable(Color.RED));
-        menuColor.add(menuColorItem);
+        redItem = new JMenuItem(Constants.STRING_RED);
+        menuColor.add(redItem);
 
-        menuColorItem = new JMenuItem(Constants.STRING_BLUE);
-        menuColorItem.addActionListener(e -> setColorObservable(Color.BLUE));
-        menuColor.add(menuColorItem);
+        blueItem = new JMenuItem(Constants.STRING_BLUE);
+        menuColor.add(blueItem);
 
-    }
+        greenItem = new JMenuItem(Constants.STRING_GREEN);
+        menuColor.add(greenItem);
 
-    private void setColorObservable(Color selectedColor) {
-        colorSubject.onNext(selectedColor);
+        colorObservable = Observable.create(emitter -> {
+            redItem.addActionListener(e -> emitter.onNext(Constants.COLOR_RED));
+            blueItem.addActionListener(e -> emitter.onNext(Constants.COLOR_BLUE));
+            greenItem.addActionListener(e -> emitter.onNext(Constants.COLOR_GREEN));
+        });
+
     }
 
     public Observable<Color> getColorObservable() {
-        return colorSubject;
+        return colorObservable;
     }
 
     private void setThicknessMenu(){
@@ -141,15 +154,9 @@ public class Menu extends JMenuBar {
         });
     }
 
-
-    private void setThicknessObservable(Integer thickness) {
-        thicknessSubject.onNext(thickness);
-    }
-
     public Observable<Integer> getThicknessObservable() {
         return thicknessObservable;
     }
-
 
     private void anEvent(MainFrame frame) {
 

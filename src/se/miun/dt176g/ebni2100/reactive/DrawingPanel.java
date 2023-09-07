@@ -45,6 +45,7 @@ public class DrawingPanel extends JPanel {
     private Disposable mouseReleaseDisposable;
     private Disposable colorDisposable;
     private Disposable thicknessDisposable;
+    private Disposable shapeDisposable;
 
     public DrawingPanel(Menu menu) {
 
@@ -69,6 +70,7 @@ public class DrawingPanel extends JPanel {
             repaint();
         });
 
+
         mouseMotionDisposable = createMouseMotionObservable()
                 .map(event -> new Point(event.getX(), event.getY()))
                 .doOnNext(newPoint -> {
@@ -84,7 +86,7 @@ public class DrawingPanel extends JPanel {
             int startY = event.getY();
             startPoint.x(startX);
             startPoint.y(startY);
-            currentShape = new StraightLine(startX, startY, 0, 0, currentColor, currentThickness);
+            currentShape = new Rectangle(startX, startY, 0, 0, currentColor, currentThickness);
             drawing.addShape(currentShape);
         });
 
@@ -109,9 +111,6 @@ public class DrawingPanel extends JPanel {
 
             }
         });
-
-
-
     }
 
     private Observable<MouseEvent> createMouseMotionObservable(){
