@@ -3,6 +3,7 @@ package se.miun.dt176g.ebni2100.reactive;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.Disposable;
+import se.miun.dt176g.ebni2100.reactive.Shapes.Oval;
 import se.miun.dt176g.ebni2100.reactive.Shapes.Rectangle;
 
 import java.awt.*;
@@ -66,7 +67,7 @@ public class DrawingPanel extends JPanel {
             int startY = event.getY();
             startPoint.x(startX);
             startPoint.y(startY);
-            currentShape = new Rectangle(startX, startY, 0, 0, currentColor, currentThickness);
+            currentShape = new Oval(startX, startY, 0, 0, currentColor, currentThickness);
             drawing.addShape(currentShape);
         });
 

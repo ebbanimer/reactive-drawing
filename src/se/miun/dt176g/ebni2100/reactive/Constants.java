@@ -11,9 +11,9 @@ public interface Constants {
     String STRING_BLUE = "Blue";
 
     // Thickness.
-    int SMALL = 3;
-    int MEDIUM = 7;
-    int BIG = 11;
+    int SMALL = 2;
+    int MEDIUM = 5;
+    int BIG = 9;
     String STRING_SMALL = "Small";
     String STRING_MEDIUM = "Medium";
     String STRING_BIG = "Big";
