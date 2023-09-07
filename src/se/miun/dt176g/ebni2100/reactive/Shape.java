@@ -20,10 +20,10 @@ import java.awt.*;
 public abstract class Shape implements Drawable {
 
     // private member : some container storing coordinates
-    private Color color;
-    private int thickness;
-    private int startX;
-    private int startY;
+    private final Color color;
+    private final int thickness;
+    private final int startX;
+    private final int startY;
     private int width;
     private int height;
 
