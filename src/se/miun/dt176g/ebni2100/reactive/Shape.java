@@ -22,8 +22,8 @@ public abstract class Shape implements Drawable {
     // private member : some container storing coordinates
     private final Color color;
     private final int thickness;
-    private final int startX;
-    private final int startY;
+    private int startX;
+    private int startY;
     private int width;
     private int height;
 
@@ -39,6 +39,11 @@ public abstract class Shape implements Drawable {
     public void setSize(int width, int height) {
         this.width = width;
         this.height = height;
+    }
+
+    public void setPosition(int x, int y){
+        this.startX = x;
+        this.startY = y;
     }
 
     protected int getX(){

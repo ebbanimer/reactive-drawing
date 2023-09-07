@@ -47,6 +47,7 @@ public class DrawingPanel extends JPanel {
         currentThickness = Constants.MEDIUM;
 
         drawing = new Drawing();
+        startPoint = new Point(0, 0);  // Initialize start-point.
         currentPoint = new Point(0, 0); // Initialize current point
         currentShape = null; // Initialize the current shape to null
 
@@ -63,6 +64,8 @@ public class DrawingPanel extends JPanel {
             // Handle the mouse press event here
             int startX = event.getX();
             int startY = event.getY();
+            startPoint.x(startX);
+            startPoint.y(startY);
             currentShape = new Rectangle(startX, startY, 0, 0, currentColor, currentThickness);
             drawing.addShape(currentShape);
         });
@@ -70,12 +73,18 @@ public class DrawingPanel extends JPanel {
         mouseDragDisposable = createMouseDragObservable().subscribe(event -> {
             // Update the current shape's size or position using the provided MouseEvent
             if (currentShape != null) {
-                int newWidth = Math.abs(event.getX() - currentShape.getX());
-                int newHeight = Math.abs(event.getY() - currentShape.getY());
+                int newX = Math.min(event.getX(), startPoint.x());
+                int newY = Math.min(event.getY(), startPoint.y());
+                int newWidth = Math.abs(event.getX() - startPoint.x());
+                int newHeight = Math.abs(event.getY() - startPoint.y());
+
+                currentShape.setPosition(newX, newY);
                 currentShape.setSize(newWidth, newHeight);
+
                 repaint(); // Redraw the panel with the updated shape size
             }
         });
+
 
     }
 
