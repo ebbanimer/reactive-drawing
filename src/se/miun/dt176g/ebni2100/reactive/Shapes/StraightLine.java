@@ -5,8 +5,8 @@ import se.miun.dt176g.ebni2100.reactive.Shape;
 import java.awt.*;
 
 public class StraightLine extends Shape {
-    public StraightLine(int x, int y, int width, int height, Color color, int thickness) {
-        super(x, y, width, height, color, thickness);
+    public StraightLine(Color color, int thickness) {
+        super(color, thickness);
     }
 
     @Override

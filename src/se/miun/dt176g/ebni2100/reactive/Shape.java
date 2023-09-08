@@ -27,11 +27,7 @@ public abstract class Shape implements Drawable {
     private int width;
     private int height;
 
-    public Shape(int x, int y, int width, int height, Color color, int thickness) {
-        this.startX = x;
-        this.startY = y;
-        this.width = width;
-        this.height = height;
+    public Shape(Color color, int thickness) {
         this.color = color;
         this.thickness = thickness;
     }

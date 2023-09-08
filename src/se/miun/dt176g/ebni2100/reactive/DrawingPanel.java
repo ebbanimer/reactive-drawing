@@ -38,6 +38,8 @@ public class DrawingPanel extends JPanel {
     private Shape currentShape; // Store the shape being drawn
     private Color currentColor; // Store the selected color
     private int currentThickness; // Store the selected thickness
+    private String lastSelectedShape = Constants.RECTANGLE; // Default shape
+
 
     private Disposable mouseMotionDisposable;
     private Disposable mousePressDisposable;
@@ -52,12 +54,12 @@ public class DrawingPanel extends JPanel {
         // Default values
         currentColor = Constants.COLOR_RED;
         currentThickness = Constants.MEDIUM;
+        currentShape = new Rectangle(currentColor, currentThickness);
 
         drawing = new Drawing();
         this.menu = menu;
         startPoint = new Point(0, 0);  // Initialize start-point.
         currentPoint = new Point(0, 0); // Initialize current point
-        currentShape = null; // Initialize the current shape to null
 
         // Subscribe to the color observable to update the current color
         colorDisposable = menu.getColorObservable().subscribe(selectedColor -> {
@@ -67,6 +69,17 @@ public class DrawingPanel extends JPanel {
 
         thicknessDisposable = menu.getThicknessObservable().subscribe(selectedThickness -> {
             currentThickness = selectedThickness;
+            repaint();
+        });
+
+        shapeDisposable = menu.getShapeObservable().subscribe(selectedShape -> {
+            lastSelectedShape = selectedShape; // Update the last selected shape type
+            switch (selectedShape) {
+                case Constants.RECTANGLE: currentShape = new Rectangle(currentColor, currentThickness); break;
+                case Constants.OVAL: currentShape = new Oval(currentColor, currentThickness); break;
+                case Constants.STRAIGHT_LINE: currentShape = new StraightLine(currentColor, currentThickness); break;
+                case Constants.FREEHAND: currentShape = new Freehand(currentColor, currentThickness); break;
+            }
             repaint();
         });
 
@@ -86,9 +99,18 @@ public class DrawingPanel extends JPanel {
             int startY = event.getY();
             startPoint.x(startX);
             startPoint.y(startY);
-            currentShape = new Rectangle(startX, startY, 0, 0, currentColor, currentThickness);
+
+            // Create an instance of the last selected shape type
+            switch (lastSelectedShape) {
+                case Constants.RECTANGLE: currentShape = new Rectangle(currentColor, currentThickness); break;
+                case Constants.OVAL: currentShape = new Oval(currentColor, currentThickness); break;
+                case Constants.STRAIGHT_LINE: currentShape = new StraightLine(currentColor, currentThickness); break;
+                case Constants.FREEHAND: currentShape = new Freehand(currentColor, currentThickness); break;
+            }
+            currentShape.setPosition(startX, startY);
             drawing.addShape(currentShape);
         });
+
 
         mouseDragDisposable = createMouseDragObservable().subscribe(event -> {
             // Update the current line's position and size using the provided MouseEvent
@@ -111,6 +133,7 @@ public class DrawingPanel extends JPanel {
 
             }
         });
+
     }
 
     private Observable<MouseEvent> createMouseMotionObservable(){
@@ -164,8 +187,21 @@ public class DrawingPanel extends JPanel {
     }
 
 
-    private void createMouseReleaseObservable(){
+    private Observable<MouseEvent> createMouseReleaseObservable(){
+        return Observable.create(emitter -> {
+            MouseAdapter listener = new MouseAdapter() {
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    // Emit the mouse drag event
+                    emitter.onNext(e);
+                }
+            };
 
+            addMouseListener(listener);
+
+            // Cleanup when the observable is disposed (e.g., panel removal)
+            emitter.setCancellable(() -> removeMouseListener(listener));
+        });
     }
 
     public void redraw() {

@@ -11,8 +11,8 @@ public class Freehand extends Shape {
 
     private final List<Point> points;
 
-    public Freehand(int x, int y, int width, int height, Color color, int thickness) {
-        super(x, y, width, height, color, thickness);
+    public Freehand(Color color, int thickness) {
+        super(color, thickness);
         this.points = new ArrayList<>();
     }
 

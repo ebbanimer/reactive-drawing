@@ -14,8 +14,8 @@ import java.awt.*;
 public class Rectangle extends Shape {
 
 
-    public Rectangle(int x, int y, int width, int height, Color color, int thickness) {
-        super(x, y, width, height, color, thickness);
+    public Rectangle(Color color, int thickness) {
+        super(color, thickness);
     }
 
 

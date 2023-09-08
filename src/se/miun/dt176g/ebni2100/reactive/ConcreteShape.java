@@ -15,8 +15,8 @@ import java.awt.*;
 
 public class ConcreteShape extends Shape {
 
-    public ConcreteShape(int x, int y, int width, int height, Color color, int thickness) {
-        super(x, y, width, height, color, thickness);
+    public ConcreteShape(Color color, int thickness) {
+        super(color, thickness);
     }
 
     @Override
