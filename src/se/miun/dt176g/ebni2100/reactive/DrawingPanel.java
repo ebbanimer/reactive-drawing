@@ -119,6 +119,11 @@ public class DrawingPanel extends JPanel {
                     Freehand freehand = (Freehand) currentShape;
                     freehand.addPoint(new Point(event.getX(), event.getY()));
                     repaint(); // Redraw the panel with the updated shape
+                } else if (currentShape instanceof StraightLine){
+                    StraightLine straightLine = (StraightLine) currentShape;
+                    straightLine.setEndPoint(event.getX(), event.getY()); // Set the end point
+
+                    repaint(); // Redraw the panel with the updated straight line
                 } else {
                     int newX = Math.min(event.getX(), startPoint.x());
                     int newY = Math.min(event.getY(), startPoint.y());
