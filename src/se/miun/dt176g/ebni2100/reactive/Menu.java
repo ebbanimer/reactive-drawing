@@ -3,6 +3,7 @@ package se.miun.dt176g.ebni2100.reactive;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
+import se.miun.dt176g.ebni2100.reactive.Shapes.ShapeType;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -25,7 +26,7 @@ public class Menu extends JMenuBar {
 
     private Observable<Color> colorObservable;
     private Observable<Integer> thicknessObservable;
-    private Observable<String> shapeObservable;
+    private Observable<ShapeType> shapeObservable;
 
 
     public Menu(MainFrame frame) {
@@ -82,14 +83,14 @@ public class Menu extends JMenuBar {
         menuShape.add(freehandItem);
 
         shapeObservable = Observable.create(emitter -> {
-            rectangleItem.addActionListener(e -> emitter.onNext(Constants.RECTANGLE));
-            ovalItem.addActionListener(e -> emitter.onNext(Constants.OVAL));
-            lineItem.addActionListener(e -> emitter.onNext(Constants.STRAIGHT_LINE));
-            freehandItem.addActionListener(e -> emitter.onNext(Constants.FREEHAND));
+            rectangleItem.addActionListener(e -> emitter.onNext(ShapeType.RECTANGLE));
+            ovalItem.addActionListener(e -> emitter.onNext(ShapeType.OVAL));
+            lineItem.addActionListener(e -> emitter.onNext(ShapeType.STRAIGHT_LINE));
+            freehandItem.addActionListener(e -> emitter.onNext(ShapeType.FREEHAND));
         });
     }
 
-    public Observable<String> getShapeObservable(){
+    public Observable<ShapeType> getShapeObservable(){
         return shapeObservable;
     }
 
