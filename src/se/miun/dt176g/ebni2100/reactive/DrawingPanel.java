@@ -28,22 +28,20 @@ public class DrawingPanel extends JPanel {
     private Drawing drawing;
     private Point startPoint;
     private Point currentPoint;
-    private Observable<MouseEvent> mouseEventObservable;
-    private Disposable mouseEventDisposable;
 
     private Shape currentShape; // Store the shape being drawn
     private Color currentColor; // Store the selected color
     private int currentThickness; // Store the selected thickness
     private ShapeType lastSelectedShape = ShapeType.RECTANGLE; // default
 
-
     private Disposable mouseMotionDisposable;
     private Disposable mousePressDisposable;
     private Disposable mouseDragDisposable;
-    private Disposable mouseReleaseDisposable;
     private Disposable colorDisposable;
     private Disposable thicknessDisposable;
     private Disposable shapeDisposable;
+    private Disposable optionDisposable;
+
 
     public DrawingPanel(Menu menu) {
 
@@ -73,12 +71,20 @@ public class DrawingPanel extends JPanel {
         colorDisposable = menu.getColorObservable().subscribe(this::updateColor);
         thicknessDisposable = menu.getThicknessObservable().subscribe(this::updateThickness);
         shapeDisposable = menu.getShapeObservable().subscribe(this::updateShape);
+        optionDisposable = menu.getOptionObservable().subscribe(this::handleOptions);
     }
 
     private void initializeMouseEvents() {
         mouseMotionDisposable = createMouseMotionObservable().subscribe(this::handleMouseMotion);
         mousePressDisposable = createMousePressObservable().subscribe(this::handleMousePress);
         mouseDragDisposable = createMouseDragObservable().subscribe(this::handleMouseDrag);
+    }
+
+    private void handleOptions(String option){
+        if (option.equals("Clear")){
+            drawing.emptyShapes();
+            repaint();
+        }
     }
 
     private void updateColor(Color selectedColor) {
@@ -207,10 +213,6 @@ public class DrawingPanel extends JPanel {
             emitter.setCancellable(() -> removeMouseMotionListener(listener));
         });
     }
-
-
-
-
 
     @Override
     protected void paintComponent(Graphics g) {

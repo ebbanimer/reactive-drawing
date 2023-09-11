@@ -36,6 +36,10 @@ public class Drawing implements Drawable {
         shapes.add(s);
     }
 
+    public void emptyShapes(){
+        shapes.clear();
+    }
+
 
     @Override
     public void draw(Graphics g) {

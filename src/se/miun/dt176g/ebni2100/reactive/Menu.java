@@ -24,6 +24,7 @@ public class Menu extends JMenuBar {
     private static final long serialVersionUID = 1L;
     private final MainFrame frame;
 
+    private Observable<String> optionObservable;
     private Observable<Color> colorObservable;
     private Observable<Integer> thicknessObservable;
     private Observable<ShapeType> shapeObservable;
@@ -46,40 +47,34 @@ public class Menu extends JMenuBar {
 
     private void setOptionsMenu(){
 
-        JMenu menuOptions;
-        JMenuItem menuOptionItem;
-
-        menuOptions = new JMenu("Options");
+        JMenu menuOptions  = new JMenu("Options");
         this.add(menuOptions);
 
-        // OPTIONS
-        menuOptionItem = new JMenuItem("Clear");
-        menuOptionItem.addActionListener(e -> anEvent(frame));
+        JMenuItem menuOptionItem = new JMenuItem("Clear");
+
+        optionObservable = Observable.create(emitter -> {
+            menuOptionItem.addActionListener(e -> emitter.onNext("Clear"));
+        });
         menuOptions.add(menuOptionItem);
+    }
+
+    public Observable<String> getOptionObservable(){
+        return optionObservable;
     }
 
     private void setShapeMenu(){
 
-        JMenu menuShape;
-        JMenuItem rectangleItem;
-        JMenuItem ovalItem;
-        JMenuItem lineItem;
-        JMenuItem freehandItem;
-
-        menuShape = new JMenu("Shapes");
+        JMenu menuShape  = new JMenu("Shapes");
         this.add(menuShape);
 
-        // SHAPES
-        rectangleItem = new JMenuItem("Rectangle");
+        JMenuItem rectangleItem  = new JMenuItem("Rectangle");
+        JMenuItem ovalItem  = new JMenuItem("Oval");
+        JMenuItem lineItem  = new JMenuItem("Straight Line");
+        JMenuItem freehandItem = new JMenuItem("Freehand");
+
         menuShape.add(rectangleItem);
-
-        ovalItem = new JMenuItem("Oval");
         menuShape.add(ovalItem);
-
-        lineItem = new JMenuItem("Straight Line");
         menuShape.add(lineItem);
-
-        freehandItem = new JMenuItem("Freehand");
         menuShape.add(freehandItem);
 
         shapeObservable = Observable.create(emitter -> {
@@ -96,22 +91,15 @@ public class Menu extends JMenuBar {
 
     private void setColorMenu(){
 
-        JMenu menuColor;
-        JMenuItem blueItem;
-        JMenuItem redItem;
-        JMenuItem greenItem;
-
-        menuColor = new JMenu("Color");
+        JMenu menuColor = new JMenu("Color");
         this.add(menuColor);
 
-        // COLOR
-        redItem = new JMenuItem(Constants.STRING_RED);
+        JMenuItem blueItem = new JMenuItem(Constants.STRING_BLUE);
+        JMenuItem redItem = new JMenuItem(Constants.STRING_RED);
+        JMenuItem greenItem = new JMenuItem(Constants.STRING_GREEN);
+
         menuColor.add(redItem);
-
-        blueItem = new JMenuItem(Constants.STRING_BLUE);
         menuColor.add(blueItem);
-
-        greenItem = new JMenuItem(Constants.STRING_GREEN);
         menuColor.add(greenItem);
 
         colorObservable = Observable.create(emitter -> {
@@ -119,7 +107,6 @@ public class Menu extends JMenuBar {
             blueItem.addActionListener(e -> emitter.onNext(Constants.COLOR_BLUE));
             greenItem.addActionListener(e -> emitter.onNext(Constants.COLOR_GREEN));
         });
-
     }
 
     public Observable<Color> getColorObservable() {
@@ -128,22 +115,16 @@ public class Menu extends JMenuBar {
 
     private void setThicknessMenu(){
 
-        JMenu menuThickness;
-        JMenuItem thicknessSmallItem;
-        JMenuItem thicknessMediumItem;
-        JMenuItem thicknessBigItem;
-
-        menuThickness = new JMenu("Thickness");
+        JMenu menuThickness = new JMenu("Thickness");
         this.add(menuThickness);
 
-        // THICKNESS
-        thicknessSmallItem = new JMenuItem(Constants.STRING_SMALL);
+        JMenuItem thicknessSmallItem = new JMenuItem(Constants.STRING_SMALL);
+        JMenuItem thicknessMediumItem = new JMenuItem(Constants.STRING_MEDIUM);
+        JMenuItem thicknessBigItem = new JMenuItem(Constants.STRING_BIG);
+
+
         menuThickness.add(thicknessSmallItem );
-
-        thicknessMediumItem = new JMenuItem(Constants.STRING_MEDIUM);
         menuThickness.add(thicknessMediumItem);
-
-        thicknessBigItem = new JMenuItem(Constants.STRING_BIG);
         menuThickness.add(thicknessBigItem);
 
         // Initialize observables
@@ -168,10 +149,5 @@ public class Menu extends JMenuBar {
             JOptionPane.showMessageDialog(frame, message);
         }
     }
-
-    private void anotherEvent(MainFrame frame) {
-
-    }
-
 }
 
