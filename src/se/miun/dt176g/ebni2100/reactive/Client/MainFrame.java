@@ -2,6 +2,10 @@ package se.miun.dt176g.ebni2100.reactive.Client;
 
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.net.Socket;
 import javax.swing.*;
 
 /**
@@ -19,6 +23,7 @@ public class MainFrame extends JFrame {
     private String header;
     private DrawingPanel drawingPanel;
     private Menu menu;
+    private Socket serverSocket; // Added to hold the server connection
 
     public MainFrame() {
 
@@ -41,7 +46,27 @@ public class MainFrame extends JFrame {
 
         this.setJMenuBar(menu);
 
+        JButton connectButton = new JButton("Connect to Server");
+        connectButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (serverSocket == null || serverSocket.isClosed()) {
+                    try {
+                        // Establish a connection to the server (replace with your server's IP and port)
+                        serverSocket = new Socket("localhost", 12345);
+                        JOptionPane.showMessageDialog(MainFrame.this, "Connected to the server!");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(MainFrame.this, "Failed to connect to the server.");
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(MainFrame.this, "Already connected to the server.");
+                }
+            }
+        });
+
+        // Add the connect button to the frame
+        this.add(connectButton, BorderLayout.NORTH);
+
     }
-
-
 }
