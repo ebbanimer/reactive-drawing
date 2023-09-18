@@ -77,6 +77,7 @@ public class Menu extends JMenuBar {
         menuShape.add(lineItem);
         menuShape.add(freehandItem);
 
+        // Create a custom observable, and pass the ShapeType when the event-listener is triggered.
         shapeObservable = Observable.create(emitter -> {
             rectangleItem.addActionListener(e -> emitter.onNext(ShapeType.RECTANGLE));
             ovalItem.addActionListener(e -> emitter.onNext(ShapeType.OVAL));

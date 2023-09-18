@@ -62,7 +62,8 @@ public class DrawingPanel extends JPanel {
     private void initializeProperties(Menu menu) {
         currentColor = Constants.COLOR_RED;
         currentThickness = Constants.MEDIUM;
-        setShape(lastSelectedShape);
+        //setShape(lastSelectedShape);
+        currentShape = createShape(lastSelectedShape);
         drawing = new Drawing();
         startPoint = new Point(0, 0);
         currentPoint = new Point(0, 0);
@@ -70,14 +71,42 @@ public class DrawingPanel extends JPanel {
         // Subscribe to color, thickness, and shape observables
         colorDisposable = menu.getColorObservable().subscribe(this::updateColor);
         thicknessDisposable = menu.getThicknessObservable().subscribe(this::updateThickness);
-        shapeDisposable = menu.getShapeObservable().subscribe(this::updateShape);
+
+        // Use map to transform the emitted ShapeType from the observable in the Menu-class into a Shape object,
+        // and then set the shape using corresponding method.
+        shapeDisposable = menu.getShapeObservable()
+                .map(this::createShape)
+                .subscribe(this::setShapeAndRepaint);
+
         optionDisposable = menu.getOptionObservable().subscribe(this::handleOptions);
     }
 
     private void initializeMouseEvents() {
+        // Subscribe to the corresponding observables, and handle the event.
         mouseMotionDisposable = createMouseMotionObservable().subscribe(this::handleMouseMotion);
         mousePressDisposable = createMousePressObservable().subscribe(this::handleMousePress);
         mouseDragDisposable = createMouseDragObservable().subscribe(this::handleMouseDrag);
+    }
+
+    private Shape createShape(ShapeType shapeType) {
+        lastSelectedShape = shapeType;
+        switch (shapeType) {
+            case RECTANGLE:
+                return new Rectangle(currentColor, currentThickness);
+            case OVAL:
+                return new Oval(currentColor, currentThickness);
+            case STRAIGHT_LINE:
+                return new StraightLine(currentColor, currentThickness);
+            case FREEHAND:
+                return new Freehand(currentColor, currentThickness);
+            default:
+                return currentShape; // Use the current shape as a fallback
+        }
+    }
+
+    private void setShapeAndRepaint(Shape newShape) {
+        currentShape = newShape;
+        repaint();
     }
 
     private void handleOptions(String option){
@@ -97,12 +126,6 @@ public class DrawingPanel extends JPanel {
         repaint();
     }
 
-    private void updateShape(ShapeType selectedShape) {
-        lastSelectedShape = selectedShape;
-        setShape(selectedShape);
-        repaint();
-    }
-
     private void handleMouseMotion(MouseEvent event) {
         Point newPoint = new Point(event.getX(), event.getY());
         updateCurrentPoint(newPoint);
@@ -113,11 +136,21 @@ public class DrawingPanel extends JPanel {
         currentPoint = newPoint;
     }
 
+    /**
+     * Method that is triggered when the mouse is pressed.
+     * @param event mouse-pressed event.
+     */
     private void handleMousePress(MouseEvent event) {
+
+        // Get coordinates where the mouse was pressed.
         int startX = event.getX();
         int startY = event.getY();
+
+        // Update the start-point using corresponding method, and store the shape to variable.
         updateStartPoint(new Point(startX, startY));
-        setShape(lastSelectedShape);
+        currentShape = createShape(lastSelectedShape);
+
+        // Set the start-position and add the shape to the drawing.
         currentShape.setPosition(startX, startY);
         drawing.addShape(currentShape);
     }
@@ -179,6 +212,10 @@ public class DrawingPanel extends JPanel {
         });
     }
 
+    /**
+     * Attach a mouse-pressed listener and emit the MouseEvent object.
+     * @return custom observable for mouse-press.
+     */
     private Observable<MouseEvent> createMousePressObservable() {
         return Observable.create(emitter -> {
             MouseAdapter listener = new MouseAdapter() {
