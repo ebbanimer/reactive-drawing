@@ -1,4 +1,4 @@
-package se.miun.dt176g.ebni2100.reactive;
+package se.miun.dt176g.ebni2100.reactive.Client;
 
 /**
  * <h1>Drawable</h1>

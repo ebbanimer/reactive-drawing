@@ -1,9 +1,8 @@
-package se.miun.dt176g.ebni2100.reactive;
+package se.miun.dt176g.ebni2100.reactive.Client;
 
 
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.subjects.PublishSubject;
-import se.miun.dt176g.ebni2100.reactive.Shapes.ShapeType;
+import se.miun.dt176g.ebni2100.reactive.Client.Shapes.ShapeType;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;

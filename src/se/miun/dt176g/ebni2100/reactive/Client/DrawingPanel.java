@@ -1,16 +1,15 @@
-package se.miun.dt176g.ebni2100.reactive;
+package se.miun.dt176g.ebni2100.reactive.Client;
 
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.Disposable;
-import se.miun.dt176g.ebni2100.reactive.Shapes.*;
-import se.miun.dt176g.ebni2100.reactive.Shapes.Rectangle;
+import se.miun.dt176g.ebni2100.reactive.Client.Shapes.*;
+import se.miun.dt176g.ebni2100.reactive.Client.Shapes.Rectangle;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
-import java.awt.event.MouseMotionListener;
 import javax.swing.*;
 
 /**

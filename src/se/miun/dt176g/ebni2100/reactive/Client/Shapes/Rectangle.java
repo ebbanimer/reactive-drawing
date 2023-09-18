@@ -1,6 +1,6 @@
-package se.miun.dt176g.ebni2100.reactive.Shapes;
+package se.miun.dt176g.ebni2100.reactive.Client.Shapes;
 
-import se.miun.dt176g.ebni2100.reactive.Shape;
+import se.miun.dt176g.ebni2100.reactive.Client.Shape;
 
 import java.awt.*;
 
