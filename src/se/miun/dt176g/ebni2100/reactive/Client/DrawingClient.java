@@ -20,10 +20,6 @@ public class DrawingClient {
 
 
         // Make sure GUI is created on the event dispatching thread
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                new MainFrame().setVisible(true);
-            }
-        });
+        SwingUtilities.invokeLater(() -> new MainFrame().setVisible(true));
     }
 }

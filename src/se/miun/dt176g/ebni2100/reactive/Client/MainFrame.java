@@ -38,35 +38,54 @@ public class MainFrame extends JFrame {
         // Changes layout from default to BorderLayout
         this.setLayout(new BorderLayout());
 
-        // Creates all necessary objects and adds them to the MainFrame (just one object right now)
-        menu = new Menu(this);
-        drawingPanel = new DrawingPanel(menu);
-        drawingPanel.setBounds(0, 0, getWidth(), getHeight());
-        this.getContentPane().add(drawingPanel, BorderLayout.CENTER);
+        connectAndDrawing();
 
-        this.setJMenuBar(menu);
+    }
 
+    private void connectAndDrawing(){
+        // TODO se till så att den bara öppnar drawingpanel om den connectar. när den connectar,
+        // hämta alla föregående drawings också
         JButton connectButton = new JButton("Connect to Server");
-        connectButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (serverSocket == null || serverSocket.isClosed()) {
-                    try {
-                        // Establish a connection to the server (replace with your server's IP and port)
-                        serverSocket = new Socket("localhost", 12345);
-                        JOptionPane.showMessageDialog(MainFrame.this, "Connected to the server!");
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                        JOptionPane.showMessageDialog(MainFrame.this, "Failed to connect to the server.");
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(MainFrame.this, "Already connected to the server.");
+        // Add the connect button to the frame
+        this.add(connectButton, BorderLayout.CENTER);
+
+        JPanel connectPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        connectPanel.add(connectButton);
+
+        // Add the connect panel to the frame
+        this.add(connectPanel, BorderLayout.CENTER);
+
+        connectButton.addActionListener(e -> {
+            if (serverSocket == null || serverSocket.isClosed()) {
+                try {
+                    // Establish a connection to the server (replace with your server's IP and port)
+                    serverSocket = new Socket("localhost", 12345);
+                    JOptionPane.showMessageDialog(MainFrame.this, "Connected to the server!");
+
+                    // Remove the connect panel
+                    this.getContentPane().remove(connectPanel);
+
+                    // Create the drawing panel and menu
+                    menu = new Menu(this);
+                    drawingPanel = new DrawingPanel(menu);
+                    drawingPanel.setBounds(0, 0, getWidth(), getHeight());
+
+                    // Add the drawing panel to the frame's CENTER region
+                    this.getContentPane().add(drawingPanel, BorderLayout.CENTER);
+
+                    // Set the menu
+                    this.setJMenuBar(menu);
+
+                    // Repaint the frame
+                    this.validate();
+                    this.repaint();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(MainFrame.this, "Failed to connect to the server.");
                 }
+            } else {
+                JOptionPane.showMessageDialog(MainFrame.this, "Already connected to the server.");
             }
         });
-
-        // Add the connect button to the frame
-        this.add(connectButton, BorderLayout.NORTH);
-
     }
 }

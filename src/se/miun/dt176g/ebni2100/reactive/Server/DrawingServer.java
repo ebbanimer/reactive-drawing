@@ -21,7 +21,6 @@ public class DrawingServer {
             while (true) {
                 try {
                     Socket clientSocket = serverSocket.accept(); // Accept a client connection
-                    System.out.println("Client connected: " + clientSocket.getInetAddress());
                     emitter.onNext(clientSocket); // Emit the client socket
                 } catch (IOException e) {
                     emitter.onError(e); // Handle any errors
