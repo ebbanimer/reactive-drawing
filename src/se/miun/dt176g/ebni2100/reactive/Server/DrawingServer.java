@@ -6,6 +6,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -20,10 +21,19 @@ public class DrawingServer {
     private static List<Shape> shapes = new ArrayList<>();
     private static final PublishSubject<Shape> incomingShapes = PublishSubject.create();
 
+    // Use a PublishSubject to multicast shapes to all clients
+    private static final PublishSubject<Shape> shapeSubject = PublishSubject.create();
+
+
     public static void main(String[] args) throws IOException {
         int portNumber = 12345;
         ServerSocket serverSocket = new ServerSocket(portNumber);
         System.out.println("Server is running. Waiting for client connections...");
+
+        // Create an instance of ServerMainFrame and start it
+        ServerDrawingFrame serverMainFrame = new ServerDrawingFrame();
+        serverMainFrame.setVisible(true);
+
 
         // Create an observable for incoming client connections
         Observable<Socket> clientConnectionsObservable = Observable.create(emitter -> {
@@ -49,7 +59,13 @@ public class DrawingServer {
                         try {
                             Shape receivedShape = (Shape) objectInputStream.readObject();
                             incomingShapes.onNext(receivedShape); // Publish the received shape
+                            shapes.add(receivedShape);
                             System.out.println("Received shape: " + receivedShape);
+                            System.out.println("Amount of shapes; " + shapes.size());
+
+                            // Call repaint to update the display with the new shape
+                            serverMainFrame.updateIncomingShapes(shapes);
+
                         } catch (EOFException e) {
                             // End of input stream, client has closed the connection
                             break;
@@ -60,7 +76,7 @@ public class DrawingServer {
                     }
                     // Send the list of stored shapes to the new client
                     for (Shape shape : shapes) {
-                        // Implement logic to send shape to the new client
+                        sendShapeToClient(clientSocket, shape);
                     }
                 });
 
@@ -76,6 +92,16 @@ public class DrawingServer {
 
         // Dispose of the subscription when the server is shutting down
         disposable.dispose();
+    }
+
+    private static void sendShapeToClient(Socket clientSocket, Shape shape) {
+        try {
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(clientSocket.getOutputStream());
+            objectOutputStream.writeObject(shape);
+            objectOutputStream.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

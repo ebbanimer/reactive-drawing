@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import javax.swing.*;
@@ -75,6 +76,17 @@ public class MainFrame extends JFrame {
 
                     // Initialize the ObjectOutputStream for sending shapes to the server
                     drawingPanel.setObjectOutputStream(new ObjectOutputStream(serverSocket.getOutputStream()));
+
+                    // Receive previously stored shapes from the server
+                    /*ObjectInputStream objectInputStream = new ObjectInputStream(serverSocket.getInputStream());
+                    Object receivedObject;
+                    while ((receivedObject = objectInputStream.readObject()) != null) {
+                        if (receivedObject instanceof Shape) {
+                            Shape receivedShape = (Shape) receivedObject;
+                            // Add the received shape to the local drawing
+                            drawingPanel.addShape(receivedShape);
+                        }
+                    }*/
 
                     // Add the drawing panel to the frame's CENTER region
                     this.getContentPane().add(drawingPanel, BorderLayout.CENTER);

@@ -39,6 +39,8 @@ public class DrawingPanel extends JPanel {
     private Disposable mouseMotionDisposable;
     private Disposable mousePressDisposable;
     private Disposable mouseDragDisposable;
+    private Disposable mouseReleaseDisposable;
+
     private Disposable colorDisposable;
     private Disposable thicknessDisposable;
     private Disposable shapeDisposable;
@@ -59,6 +61,10 @@ public class DrawingPanel extends JPanel {
 
     public void setObjectOutputStream(ObjectOutputStream outputStream) {
         this.objectOutputStream = outputStream;
+    }
+
+    public void addShape(Shape shape){
+        drawing.addShape(shape);
     }
 
     private void initializeProperties(Menu menu) {
