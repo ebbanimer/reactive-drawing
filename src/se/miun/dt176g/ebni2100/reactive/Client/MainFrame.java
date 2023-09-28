@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import javax.swing.*;
 
@@ -25,6 +26,7 @@ public class MainFrame extends JFrame {
     private Menu menu;
     private Socket serverSocket; // Added to hold the server connection
 
+
     public MainFrame() {
 
         // default window-size.
@@ -43,8 +45,7 @@ public class MainFrame extends JFrame {
     }
 
     private void connectAndDrawing(){
-        // TODO se till så att den bara öppnar drawingpanel om den connectar. när den connectar,
-        // hämta alla föregående drawings också
+        // TODO get past drawings from server
         JButton connectButton = new JButton("Connect to Server");
         // Add the connect button to the frame
         this.add(connectButton, BorderLayout.CENTER);
@@ -62,6 +63,7 @@ public class MainFrame extends JFrame {
                     serverSocket = new Socket("localhost", 12345);
                     JOptionPane.showMessageDialog(MainFrame.this, "Connected to the server!");
 
+
                     // Remove the connect panel
                     this.getContentPane().remove(connectPanel);
 
@@ -69,6 +71,10 @@ public class MainFrame extends JFrame {
                     menu = new Menu(this);
                     drawingPanel = new DrawingPanel(menu);
                     drawingPanel.setBounds(0, 0, getWidth(), getHeight());
+
+
+                    // Initialize the ObjectOutputStream for sending shapes to the server
+                    drawingPanel.setObjectOutputStream(new ObjectOutputStream(serverSocket.getOutputStream()));
 
                     // Add the drawing panel to the frame's CENTER region
                     this.getContentPane().add(drawingPanel, BorderLayout.CENTER);

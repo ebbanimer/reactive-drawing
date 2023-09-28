@@ -13,11 +13,12 @@ package se.miun.dt176g.ebni2100.reactive.Client;
  */
 
 import java.awt.*;
+import java.io.Serializable;
 
 /**
  *
  */
-public abstract class Shape implements Drawable {
+public abstract class Shape implements Drawable, Serializable {
 
     // private member : some container storing coordinates
     private final Color color;

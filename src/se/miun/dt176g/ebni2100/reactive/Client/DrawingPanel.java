@@ -3,6 +3,7 @@ package se.miun.dt176g.ebni2100.reactive.Client;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.subjects.PublishSubject;
 import se.miun.dt176g.ebni2100.reactive.Client.Shapes.*;
 import se.miun.dt176g.ebni2100.reactive.Client.Shapes.Rectangle;
 
@@ -10,6 +11,8 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import javax.swing.*;
 
 /**
@@ -41,21 +44,21 @@ public class DrawingPanel extends JPanel {
     private Disposable shapeDisposable;
     private Disposable optionDisposable;
 
+    // Declare a Subject to multicast shapes
+    private final PublishSubject<Shape> shapeSubject = PublishSubject.create();
+
+    private ObjectOutputStream objectOutputStream; // Used to send shapes to the server
+
 
     public DrawingPanel(Menu menu) {
 
         initializeProperties(menu);
         initializeMouseEvents();
-        
-        /*mouseMotionDisposable = createMouseMotionObservable()
-                .map(event -> new Point(event.getX(), event.getY()))
-                .doOnNext(newPoint -> {
-                    currentPoint.x(newPoint.x()); // Update the x-coordinate of Point
-                    currentPoint.y(newPoint.y()); // Update the y-coordinate of Point
-                    repaint(); // Trigger a repaint to update the mouse point on the panel
-                })
-                .subscribe();*/
 
+    }
+
+    public void setObjectOutputStream(ObjectOutputStream outputStream) {
+        this.objectOutputStream = outputStream;
     }
 
     private void initializeProperties(Menu menu) {
@@ -152,6 +155,24 @@ public class DrawingPanel extends JPanel {
         // Set the start-position and add the shape to the drawing.
         currentShape.setPosition(startX, startY);
         drawing.addShape(currentShape);
+
+        // Publish the shape to the subject
+        shapeSubject.onNext(currentShape);
+
+        // Send the shape to the server
+        sendShapeToServer();
+    }
+
+    // Add this method to send the shape to the server
+    private void sendShapeToServer() {
+        if (objectOutputStream != null && currentShape != null) {
+            try {
+                objectOutputStream.writeObject(currentShape);
+                objectOutputStream.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void updateStartPoint(Point point) {
@@ -255,14 +276,6 @@ public class DrawingPanel extends JPanel {
 
         super.paintComponent(g);
         drawing.draw(g);
-
-        // Draw a dot at the current mouse position
-        /*g.setColor(currentColor);
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setStroke(new BasicStroke(currentThickness));
-        int x = currentPoint.x() - currentThickness / 2;
-        int y = currentPoint.y() - currentThickness / 2;
-        g2d.fillOval(x, y, currentThickness, currentThickness);*/
 
     }
 
