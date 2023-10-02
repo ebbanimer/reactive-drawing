@@ -1,5 +1,7 @@
 package se.miun.dt176g.ebni2100.reactive.Client;
 
+import java.io.Serializable;
+
 /**
  * <h1>Point</h1>
  *
@@ -8,7 +10,7 @@ package se.miun.dt176g.ebni2100.reactive.Client;
  * @since 	2022-09-08
  */
 
-public class Point {
+public class Point implements Serializable {
 
     private int x, y;
 

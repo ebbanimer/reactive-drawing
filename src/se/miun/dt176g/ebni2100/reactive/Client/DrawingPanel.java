@@ -94,6 +94,7 @@ public class DrawingPanel extends JPanel {
         mouseMotionDisposable = createMouseMotionObservable().subscribe(this::handleMouseMotion);
         mousePressDisposable = createMousePressObservable().subscribe(this::handleMousePress);
         mouseDragDisposable = createMouseDragObservable().subscribe(this::handleMouseDrag);
+        mouseReleaseDisposable = createMouseReleaseObservable().subscribe(this::handleMouseRelease);
     }
 
     private Shape createShape(ShapeType shapeType) {
@@ -166,12 +167,13 @@ public class DrawingPanel extends JPanel {
         shapeSubject.onNext(currentShape);
 
         // Send the shape to the server
-        sendShapeToServer();
+        //sendShapeToServer();
     }
 
     // Add this method to send the shape to the server
     private void sendShapeToServer() {
         if (objectOutputStream != null && currentShape != null) {
+            System.out.println("width; " + currentShape.getWidth() + ", height: " + currentShape.getHeight());
             try {
                 objectOutputStream.writeObject(currentShape);
                 objectOutputStream.flush();
@@ -203,24 +205,14 @@ public class DrawingPanel extends JPanel {
                 currentShape.setSize(newWidth, newHeight);
             }
             repaint();
+            // Send the shape to the server in real-time
+            //sendShapeToServer();
         }
     }
 
-    private void setShape(ShapeType shapeType) {
-        switch (shapeType) {
-            case RECTANGLE:
-                currentShape = new Rectangle(currentColor, currentThickness);
-                break;
-            case OVAL:
-                currentShape = new Oval(currentColor, currentThickness);
-                break;
-            case STRAIGHT_LINE:
-                currentShape = new StraightLine(currentColor, currentThickness);
-                break;
-            case FREEHAND:
-                currentShape = new Freehand(currentColor, currentThickness);
-                break;
-        }
+    private void handleMouseRelease(MouseEvent event) {
+        // Call the existing method to send the shape to the server
+        sendShapeToServer();
     }
 
     private Observable<MouseEvent> createMouseMotionObservable(){
@@ -274,6 +266,23 @@ public class DrawingPanel extends JPanel {
 
             // Cleanup when the observable is disposed (e.g., panel removal)
             emitter.setCancellable(() -> removeMouseMotionListener(listener));
+        });
+    }
+
+    private Observable<MouseEvent> createMouseReleaseObservable() {
+        return Observable.create(emitter -> {
+            MouseAdapter listener = new MouseAdapter() {
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    // Emit the mouse release event
+                    emitter.onNext(e);
+                }
+            };
+
+            addMouseListener(listener);
+
+            // Cleanup when the observable is disposed (e.g., panel removal)
+            emitter.setCancellable(() -> removeMouseListener(listener));
         });
     }
 

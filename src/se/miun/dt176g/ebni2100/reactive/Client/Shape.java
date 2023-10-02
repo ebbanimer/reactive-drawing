@@ -20,6 +20,8 @@ import java.io.Serializable;
  */
 public abstract class Shape implements Drawable, Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     // private member : some container storing coordinates
     private final Color color;
     private final int thickness;
@@ -43,27 +45,27 @@ public abstract class Shape implements Drawable, Serializable {
         this.startY = y;
     }
 
-    protected int getX(){
+    public int getX(){
         return startX;
     }
 
-    protected int getY(){
+    public int getY(){
         return startY;
     }
 
-    protected int getWidth(){
+    public int getWidth(){
         return width;
     }
 
-    protected int getHeight(){
+    public int getHeight(){
         return height;
     }
 
-    protected int getThickness(){
+    public int getThickness(){
         return thickness;
     }
 
-    protected Color getColor(){
+    public Color getColor(){
         return color;
     }
 

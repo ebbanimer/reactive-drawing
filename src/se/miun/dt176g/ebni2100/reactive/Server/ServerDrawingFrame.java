@@ -35,9 +35,13 @@ public class ServerDrawingFrame extends JFrame {
         this.getContentPane().add(shapeDisplayPanel, BorderLayout.CENTER);
     }
 
-    // Method to update the list of incoming shapes
+    // Inside the updateIncomingShapes method
     public void updateIncomingShapes(List<Shape> shapes) {
+        System.out.println("hej");
         incomingShapes = shapes;
         shapeDisplayPanel.repaint();
+        // Additionally, revalidate the panel to ensure proper resizing
+        shapeDisplayPanel.revalidate();
     }
+
 }

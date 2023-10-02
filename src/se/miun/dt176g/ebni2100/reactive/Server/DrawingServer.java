@@ -53,32 +53,57 @@ public class DrawingServer {
                 .subscribeOn(Schedulers.io())
                 .subscribe(clientSocket -> {
                     System.out.println("Client connected: " + clientSocket.getInetAddress());
-                    // Receive and handle incoming shapes from the client
                     ObjectInputStream objectInputStream = new ObjectInputStream(clientSocket.getInputStream());
-                    while (true) {
-                        try {
-                            Shape receivedShape = (Shape) objectInputStream.readObject();
-                            incomingShapes.onNext(receivedShape); // Publish the received shape
-                            shapes.add(receivedShape);
-                            System.out.println("Received shape: " + receivedShape);
-                            System.out.println("Amount of shapes; " + shapes.size());
 
-                            // Call repaint to update the display with the new shape
-                            serverMainFrame.updateIncomingShapes(shapes);
+                    try {
+                        while (true) {
+                            try {
+                                Shape receivedShape = (Shape) objectInputStream.readObject();
+                                incomingShapes.onNext(receivedShape); // Publish the received shape
 
-                        } catch (EOFException e) {
-                            // End of input stream, client has closed the connection
-                            break;
-                        } catch (IOException | ClassNotFoundException e) {
-                            e.printStackTrace();
-                            break;
+                                // Check if shapes contains a shape with the same properties
+                                boolean shapeExists = false;
+                                for (int i = 0; i < shapes.size(); i++) {
+                                    Shape existingShape = shapes.get(i);
+                                    if (existingShape.equals(receivedShape)) {
+                                        // Replace the existing shape with the received one
+                                        System.out.println("It exists! Width; " + receivedShape.getWidth() + ", height; " + receivedShape.getHeight());
+                                        shapes.set(i, receivedShape);
+                                        shapeExists = true;
+                                        break;
+                                    }
+                                }
+
+                                // If the shape does not exist in the list, add it
+                                if (!shapeExists) {
+                                    shapes.add(receivedShape);
+                                }
+
+                                System.out.println("Received shape: " + receivedShape);
+                                System.out.println("Amount of shapes: " + shapes.size());
+
+                                // Call repaint to update the display with the new shapes
+                                serverMainFrame.updateIncomingShapes(shapes);
+
+                            } catch (EOFException e) {
+                                // End of input stream, client has closed the connection
+                                break;
+                            } catch (IOException | ClassNotFoundException e) {
+                                e.printStackTrace();
+                                break;
+                            }
                         }
-                    }
-                    // Send the list of stored shapes to the new client
-                    for (Shape shape : shapes) {
-                        sendShapeToClient(clientSocket, shape);
+                    } finally {
+                        // Clean up resources when the loop is terminated
+                        objectInputStream.close();
+                        clientSocket.close();
                     }
                 });
+
+        // Send the list of stored shapes to the new client
+                    /*for (Shape shape : shapes) {
+                        sendShapeToClient(clientSocket, shape);
+                    }*/
 
         // Block the main thread to keep the server running
         while (true) {
