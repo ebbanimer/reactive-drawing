@@ -37,7 +37,6 @@ public class ServerDrawingFrame extends JFrame {
 
     // Inside the updateIncomingShapes method
     public void updateIncomingShapes(List<Shape> shapes) {
-        System.out.println("hej");
         incomingShapes = shapes;
         shapeDisplayPanel.repaint();
         // Additionally, revalidate the panel to ensure proper resizing

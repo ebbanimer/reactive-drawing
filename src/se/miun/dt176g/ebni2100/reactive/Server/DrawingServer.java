@@ -24,7 +24,6 @@ public class DrawingServer {
     // Use a PublishSubject to multicast shapes to all clients
     private static final PublishSubject<Shape> shapeSubject = PublishSubject.create();
 
-
     public static void main(String[] args) throws IOException {
         int portNumber = 12345;
         ServerSocket serverSocket = new ServerSocket(portNumber);
@@ -48,14 +47,64 @@ public class DrawingServer {
             }
         });
 
-        // Subscribe to the clientConnectionsObservable and store the Disposable
         Disposable disposable = clientConnectionsObservable
                 .subscribeOn(Schedulers.io())
+                .flatMap(clientSocket -> {
+                    System.out.println("Client connected: " + clientSocket.getInetAddress());
+                    return Observable.just(clientSocket)
+                            .observeOn(Schedulers.io())
+                            .map(socket -> {
+                                try {
+                                    ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
+
+                                    while (true) {
+                                        try {
+                                            Shape receivedShape = (Shape) objectInputStream.readObject();
+                                            incomingShapes.onNext(receivedShape);
+
+                                            // Check if shapes contains a shape with the same properties
+                                            boolean shapeExists = false;
+                                            for (int i = 0; i < shapes.size(); i++) {
+                                                Shape existingShape = shapes.get(i);
+                                                if (existingShape.equals(receivedShape)) {
+                                                    shapes.set(i, receivedShape);
+                                                    shapeExists = true;
+                                                    break;
+                                                }
+                                            }
+
+                                            // If the shape does not exist in the list, add it
+                                            if (!shapeExists) {
+                                                shapes.add(receivedShape);
+                                            }
+
+                                            serverMainFrame.updateIncomingShapes(shapes);
+
+                                        } catch (EOFException e) {
+                                            // End of input stream, client has closed the connection
+                                            break;
+                                        } catch (IOException | ClassNotFoundException e) {
+                                            e.printStackTrace();
+                                            break;
+                                        }
+                                    }
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                return socket;
+                            });
+                })
+                .subscribe();
+
+
+        // Subscribe to the clientConnectionsObservable and store the Disposable
+        /*Disposable disposable = clientConnectionsObservable
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io()) // Switch to the IO thread for processing
                 .subscribe(clientSocket -> {
                     System.out.println("Client connected: " + clientSocket.getInetAddress());
-                    ObjectInputStream objectInputStream = new ObjectInputStream(clientSocket.getInputStream());
 
-                    try {
+                    try (clientSocket; ObjectInputStream objectInputStream = new ObjectInputStream(clientSocket.getInputStream())) {
                         while (true) {
                             try {
                                 Shape receivedShape = (Shape) objectInputStream.readObject();
@@ -66,8 +115,6 @@ public class DrawingServer {
                                 for (int i = 0; i < shapes.size(); i++) {
                                     Shape existingShape = shapes.get(i);
                                     if (existingShape.equals(receivedShape)) {
-                                        // Replace the existing shape with the received one
-                                        System.out.println("It exists! Width; " + receivedShape.getWidth() + ", height; " + receivedShape.getHeight());
                                         shapes.set(i, receivedShape);
                                         shapeExists = true;
                                         break;
@@ -78,9 +125,6 @@ public class DrawingServer {
                                 if (!shapeExists) {
                                     shapes.add(receivedShape);
                                 }
-
-                                System.out.println("Received shape: " + receivedShape);
-                                System.out.println("Amount of shapes: " + shapes.size());
 
                                 // Call repaint to update the display with the new shapes
                                 serverMainFrame.updateIncomingShapes(shapes);
@@ -93,17 +137,9 @@ public class DrawingServer {
                                 break;
                             }
                         }
-                    } finally {
-                        // Clean up resources when the loop is terminated
-                        objectInputStream.close();
-                        clientSocket.close();
                     }
-                });
-
-        // Send the list of stored shapes to the new client
-                    /*for (Shape shape : shapes) {
-                        sendShapeToClient(clientSocket, shape);
-                    }*/
+                    // Clean up resources when the loop is terminated
+                });*/
 
         // Block the main thread to keep the server running
         while (true) {
