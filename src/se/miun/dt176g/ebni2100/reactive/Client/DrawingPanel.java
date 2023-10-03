@@ -167,17 +167,17 @@ public class DrawingPanel extends JPanel {
 
     }
 
-    // Add this method to send the shape to the server
     private void sendShapeToServer() {
         if (objectOutputStream != null && currentShape != null) {
             try {
                 objectOutputStream.writeObject(currentShape);
-                objectOutputStream.flush();
+                objectOutputStream.reset();  // Reset the stream after sending an object
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
+
 
     private void updateStartPoint(Point point) {
         startPoint = point;

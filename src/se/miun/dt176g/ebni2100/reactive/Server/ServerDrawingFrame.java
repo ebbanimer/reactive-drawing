@@ -16,7 +16,7 @@ public class ServerDrawingFrame extends JFrame {
     public ServerDrawingFrame() {
         setTitle("Server Drawing");
         // default window-size.
-        this.setSize(1200, 900);
+        this.setSize(1000, 800);
         // application closes when the "x" in the upper-right corner is clicked.
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
