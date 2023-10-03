@@ -11,7 +11,7 @@ import java.util.List;
 public class ServerDrawingFrame extends JFrame {
 
     private List<Shape> incomingShapes = new ArrayList<>();
-    private JPanel shapeDisplayPanel;
+    private final JPanel shapeDisplayPanel;
 
     public ServerDrawingFrame() {
         setTitle("Server Drawing");

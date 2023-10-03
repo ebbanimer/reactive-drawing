@@ -70,7 +70,6 @@ public class DrawingPanel extends JPanel {
     private void initializeProperties(Menu menu) {
         currentColor = Constants.COLOR_RED;
         currentThickness = Constants.MEDIUM;
-        //setShape(lastSelectedShape);
         currentShape = createShape(lastSelectedShape);
         drawing = new Drawing();
         startPoint = new Point(0, 0);
@@ -166,14 +165,11 @@ public class DrawingPanel extends JPanel {
         // Publish the shape to the subject
         shapeSubject.onNext(currentShape);
 
-        // Send the shape to the server
-        //sendShapeToServer();
     }
 
     // Add this method to send the shape to the server
     private void sendShapeToServer() {
         if (objectOutputStream != null && currentShape != null) {
-            System.out.println("width; " + currentShape.getWidth() + ", height: " + currentShape.getHeight());
             try {
                 objectOutputStream.writeObject(currentShape);
                 objectOutputStream.flush();
@@ -205,8 +201,6 @@ public class DrawingPanel extends JPanel {
                 currentShape.setSize(newWidth, newHeight);
             }
             repaint();
-            // Send the shape to the server in real-time
-            //sendShapeToServer();
         }
     }
 
