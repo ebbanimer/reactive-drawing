@@ -63,6 +63,10 @@ public class DrawingPanel extends JPanel {
         this.objectOutputStream = outputStream;
     }
 
+    public ObjectOutputStream getObjectOutputStream(){
+        return objectOutputStream;
+    }
+
     public void addShape(Shape shape){
         drawing.addShape(shape);
     }
@@ -119,9 +123,16 @@ public class DrawingPanel extends JPanel {
 
     private void handleOptions(String option){
         if (option.equals("Clear")){
-            drawing.emptyShapes();
-            repaint();
+            Clear clearShape = new Clear(Color.WHITE, 0);
+            shapeSubject.onNext(clearShape);
+            sendShapeToServer(clearShape);
+            clearShapes();
         }
+    }
+
+    public void clearShapes(){
+        drawing.emptyShapes();
+        repaint();
     }
 
     private void updateColor(Color selectedColor) {
@@ -167,10 +178,10 @@ public class DrawingPanel extends JPanel {
 
     }
 
-    private void sendShapeToServer() {
-        if (objectOutputStream != null && currentShape != null) {
+    private void sendShapeToServer(Shape shape) {
+        if (objectOutputStream != null && shape != null) {
             try {
-                objectOutputStream.writeObject(currentShape);
+                objectOutputStream.writeObject(shape);
                 objectOutputStream.reset();  // Reset the stream after sending an object
             } catch (IOException e) {
                 e.printStackTrace();
@@ -206,7 +217,7 @@ public class DrawingPanel extends JPanel {
 
     private void handleMouseRelease(MouseEvent event) {
         // Call the existing method to send the shape to the server
-        sendShapeToServer();
+        sendShapeToServer(currentShape);
     }
 
     private Observable<MouseEvent> createMouseMotionObservable(){

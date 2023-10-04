@@ -6,11 +6,14 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.swing.*;
@@ -47,6 +50,14 @@ public class MainFrame extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setTitle(HEADER);
         this.setLayout(new BorderLayout());
+
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                handleExit();
+            }
+        });
+
     }
 
     private void connectAndDraw() {
@@ -128,8 +139,27 @@ public class MainFrame extends JFrame {
                 .subscribe(
                         this::handleReceivedShape,
                         this::handleSubscriptionError,
-                        () -> System.out.println("subscribeToServerShapes completed")
+                        () -> handleServerDisconnect()
                 );
+    }
+
+    private void handleServerDisconnect() {
+        System.out.println("Server disconnected. Cleaning up resources.");
+        // Clean up any resources related to the server connection
+        closeServerConnection();
+    }
+
+    private void closeServerConnection() {
+        try {
+            if (objectInputStream != null) {
+                objectInputStream.close();
+            }
+            if (serverSocket != null && !serverSocket.isClosed()) {
+                serverSocket.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void removeConnectPanel(JPanel connectPanel) {
@@ -153,18 +183,31 @@ public class MainFrame extends JFrame {
         drawingPanel.setObjectOutputStream(new ObjectOutputStream(serverSocket.getOutputStream()));
     }
 
-    // Create an observable for receiving shapes from the server
     private Observable<Shape> createServerShapesObservable() {
         return Observable.create(emitter -> {
             inputStreamExecutor.submit(() -> {
                 while (true) {
                     try {
+                        if (serverSocket.isClosed()) {
+                            // Socket is closed, complete the observable
+                            emitter.onComplete();
+                            break;
+                        }
+
                         Shape receivedShape = (Shape) objectInputStream.readObject();
                         emitter.onNext(receivedShape);
+                    } catch (SocketException e) {
+                        // Handle SocketException when the socket is closed
+                        System.out.println("Socket closed. Exiting loop.");
+                        emitter.onComplete();
+                        break;
                     } catch (EOFException e) {
+                        // EOFException indicates the end of the stream
+                        emitter.onComplete();
                         break;
                     } catch (IOException | ClassNotFoundException e) {
                         e.printStackTrace();
+                        emitter.onError(e);
                         break;
                     }
                 }
@@ -172,10 +215,15 @@ public class MainFrame extends JFrame {
         });
     }
 
+
     private void handleReceivedShape(Shape shape) {
         System.out.println("Received shape: " + shape);
-        drawingPanel.addShape(shape);
-        drawingPanel.repaint();
+        if (shape instanceof Clear){
+            drawingPanel.clearShapes();
+        } else {
+            drawingPanel.addShape(shape);
+            drawingPanel.repaint();
+        }
     }
 
     private void handleSubscriptionError(Throwable throwable) {
@@ -187,6 +235,24 @@ public class MainFrame extends JFrame {
         ex.printStackTrace();
         JOptionPane.showMessageDialog(this, "Failed to connect to the server.");
     }
+
+    private void handleExit() {
+        try {
+            if (drawingPanel.getObjectOutputStream() != null) {
+                drawingPanel.getObjectOutputStream().close();
+            }
+            if (objectInputStream != null) {
+                objectInputStream.close();
+            }
+            if (serverSocket != null && !serverSocket.isClosed()) {
+                serverSocket.close();
+            }
+            System.exit(0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     private void repaintFrame() {
         this.validate();
