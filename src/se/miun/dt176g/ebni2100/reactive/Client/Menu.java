@@ -12,38 +12,31 @@ import java.awt.*;
 
 
 /**
- * <h1>Menu</h1>
- *
+ * Menu.
  * @author 	Ebba Nimér
- * @version 1.0
- * @since 	2022-09-08
  */
 public class Menu extends JMenuBar {
 
     private static final long serialVersionUID = 1L;
-    private final MainFrame frame;
 
     private Observable<String> optionObservable;
     private Observable<Color> colorObservable;
     private Observable<Integer> thicknessObservable;
     private Observable<ShapeType> shapeObservable;
 
-
-    public Menu(MainFrame frame) {
-        this.frame = frame;
-        init();
-    }
-
-    private void init() {
-
-        // Set-up menus
+    /**
+     * Set up menus.
+     */
+    public Menu() {
         setOptionsMenu();
         setShapeMenu();
         setColorMenu();
         setThicknessMenu();
-
     }
 
+    /**
+     * Set up options-menu.
+     */
     private void setOptionsMenu(){
 
         JMenu menuOptions  = new JMenu("Options");
@@ -51,16 +44,24 @@ public class Menu extends JMenuBar {
 
         JMenuItem menuOptionItem = new JMenuItem("Clear");
 
+        // Create observable for clear-option.
         optionObservable = Observable.create(emitter -> {
             menuOptionItem.addActionListener(e -> emitter.onNext("Clear"));
         });
         menuOptions.add(menuOptionItem);
     }
 
+    /**
+     * Get the options-observable.
+     * @return Observable with option.
+     */
     public Observable<String> getOptionObservable(){
         return optionObservable;
     }
 
+    /**
+     * Set up shape-menu.
+     */
     private void setShapeMenu(){
 
         JMenu menuShape  = new JMenu("Shapes");
@@ -85,10 +86,17 @@ public class Menu extends JMenuBar {
         });
     }
 
+    /**
+     * Get the shape-observable.
+     * @return Observable with ShapeType.
+     */
     public Observable<ShapeType> getShapeObservable(){
         return shapeObservable;
     }
 
+    /**
+     * Set up the color-menu.
+     */
     private void setColorMenu(){
 
         JMenu menuColor = new JMenu("Color");
@@ -102,6 +110,7 @@ public class Menu extends JMenuBar {
         menuColor.add(blueItem);
         menuColor.add(greenItem);
 
+        // Create a custom observable, and pass the color when the event-listener is triggered.
         colorObservable = Observable.create(emitter -> {
             redItem.addActionListener(e -> emitter.onNext(Constants.COLOR_RED));
             blueItem.addActionListener(e -> emitter.onNext(Constants.COLOR_BLUE));
@@ -109,10 +118,17 @@ public class Menu extends JMenuBar {
         });
     }
 
+    /**
+     * Get the color-observable.
+     * @return Observable with Color.
+     */
     public Observable<Color> getColorObservable() {
         return colorObservable;
     }
 
+    /**
+     * Set up the thickness-menu.
+     */
     private void setThicknessMenu(){
 
         JMenu menuThickness = new JMenu("Thickness");
@@ -127,27 +143,20 @@ public class Menu extends JMenuBar {
         menuThickness.add(thicknessMediumItem);
         menuThickness.add(thicknessBigItem);
 
-        // Initialize observables
+        // Create a custom observable, and pass the thickness when the event-listener is triggered.
         thicknessObservable = Observable.create(emitter -> {
-            // Handle thickness selection when a menu item is clicked
             thicknessSmallItem.addActionListener(e -> emitter.onNext(Constants.SMALL));
             thicknessMediumItem.addActionListener(e -> emitter.onNext(Constants.MEDIUM));
             thicknessBigItem.addActionListener(e -> emitter.onNext(Constants.BIG));
         });
     }
 
+    /**
+     * Get the thickness-observable.
+     * @return Observable with thickness.
+     */
     public Observable<Integer> getThicknessObservable() {
         return thicknessObservable;
-    }
-
-    private void anEvent(MainFrame frame) {
-
-        String message = (String) JOptionPane.showInputDialog(frame,
-                "Send message to everyone:");
-
-        if(message != null && !message.isEmpty()) {
-            JOptionPane.showMessageDialog(frame, message);
-        }
     }
 }
 

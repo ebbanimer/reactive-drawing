@@ -4,6 +4,9 @@ import se.miun.dt176g.ebni2100.reactive.Client.Shape;
 
 import java.awt.*;
 
+/**
+ * Class representing the shape Oval.
+ */
 public class Oval extends Shape {
 
     public Oval(Color color, int thickness) {
@@ -12,12 +15,12 @@ public class Oval extends Shape {
 
     @Override
     public void draw(Graphics g) {
-        Graphics2D g2 = (Graphics2D) g; // Type-cast the parameter to Graphics2D.
+        Graphics2D g2 = (Graphics2D) g;
 
-        g2.setColor(getColor()); // Set the color of the rectangle
-        g2.setStroke(new BasicStroke(getThickness())); // Set the line thickness
+        g2.setColor(getColor());
+        g2.setStroke(new BasicStroke(getThickness()));
 
-        // Draw the rectangle using the inherited properties
+        // Draw the rectangle using the inherited properties.
         g2.fillOval(getX(), getY(), getWidth(), getHeight());
     }
 }

@@ -7,43 +7,39 @@ import java.util.List;
 
 
 /**
- * <h1>Drawing</h1>
- * Let this class store an arbitrary number of AbstractShape-objects in
- * some kind of container.
- *
+ * Class that handles the drawings.
  * @author 	Ebba Nimér
- * @version 1.0
- * @since 	2022-09-08
  */
-
 
 public class Drawing implements Drawable {
 
-
-    private List<Shape> shapes;
+    private final List<Shape> shapes;
 
     public Drawing(){
         shapes = new ArrayList<>();
     }
 
-
     /**
-     * <h1>addShape</h1> add a shape to the "SomeContainer shapes"
-     *
-     * @param s a {@link Shape} object.
+     * Add shape to the list.
+     * @param s shape.
      */
     public void addShape(Shape s) {
         shapes.add(s);
     }
 
+    /**
+     * Empty shape-list.
+     */
     public void emptyShapes(){
         shapes.clear();
     }
 
-
+    /**
+     * For each shape, call its draw-method.
+     * @param g graphics.
+     */
     @Override
     public void draw(Graphics g) {
-
         for (Shape shape : shapes) {
             shape.draw(g);
         }

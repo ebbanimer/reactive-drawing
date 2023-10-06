@@ -4,6 +4,9 @@ import se.miun.dt176g.ebni2100.reactive.Client.Shape;
 
 import java.awt.*;
 
+/**
+ * Class representing the straight line.
+ */
 public class StraightLine extends Shape {
     private int endX;
     private int endY;
@@ -12,6 +15,11 @@ public class StraightLine extends Shape {
         super(color, thickness);
     }
 
+    /**
+     * Define end-point of line.
+     * @param x x-coordinate.
+     * @param y y-coordinate.
+     */
     public void setEndPoint(int x, int y){
         this.endX = x;
         this.endY = y;
@@ -20,12 +28,10 @@ public class StraightLine extends Shape {
     @Override
     public void draw(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
-        g2.setColor(getColor()); // Set the color of the line
-        g2.setStroke(new BasicStroke(getThickness())); // Set the line thickness
-
-        g2.drawLine(getX(), getY(), endX, endY);
+        g2.setColor(getColor());
+        g2.setStroke(new BasicStroke(getThickness()));
 
         // Draw the straight line using the inherited properties
-        //g2.drawLine(getX(), getY(), getX() + getWidth(), getY() + getHeight());
+        g2.drawLine(getX(), getY(), endX, endY);
     }
 }

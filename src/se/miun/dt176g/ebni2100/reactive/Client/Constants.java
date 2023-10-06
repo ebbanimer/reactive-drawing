@@ -19,10 +19,4 @@ public interface Constants {
     String STRING_SMALL = "Small";
     String STRING_MEDIUM = "Medium";
     String STRING_BIG = "Big";
-
-    // Shapes
-    String RECTANGLE = "Rectange";
-    String OVAL = "Oval";
-    String STRAIGHT_LINE = "Straight Line";
-    String FREEHAND = "Freehand";
 }
