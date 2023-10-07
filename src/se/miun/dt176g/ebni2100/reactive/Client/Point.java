@@ -13,7 +13,7 @@ public class Point implements Serializable {
     private final int y;
 
     /**
-     * Initalize point with coordinates.
+     * Initialize point with coordinates.
      * @param x x-coordinate.
      * @param y y-coordinate.
      */
@@ -22,10 +22,18 @@ public class Point implements Serializable {
         this.y = y;
     }
 
+    /**
+     * Gets the points x-coordinate.
+     * @return X coordinate.
+     */
     public int x() {
         return x;
     }
 
+    /**
+     * Gets the points y-coordinate.
+     * @return Y coordinate.
+     */
     public int y() {
         return y;
     }

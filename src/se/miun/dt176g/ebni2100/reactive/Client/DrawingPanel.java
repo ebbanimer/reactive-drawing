@@ -15,8 +15,7 @@ import java.io.ObjectOutputStream;
 import javax.swing.*;
 
 /**
- * JPanel which represent the drawingpanel. It holds the canvas for drawing the shapes, and
- * displaying shapes.
+ * JPanel representing the drawing panel. It holds the canvas for drawing shapes and displaying them.
  * @author 	Ebba Nimér
  */
 
@@ -37,8 +36,8 @@ public class DrawingPanel extends JPanel {
     private ObjectOutputStream objectOutputStream; // Used to send shapes to the server
 
     /**
-     * Initialize drawing-panel with properties and mouse-events.
-     * @param menu menu.
+     * Initialize the drawing panel with properties and mouse events.
+     * @param menu The menu for controlling drawing options.
      */
     public DrawingPanel(Menu menu) {
         initializeProperties(menu);
@@ -46,16 +45,16 @@ public class DrawingPanel extends JPanel {
     }
 
     /**
-     * Set the object-output-stream to communicate to the server.
-     * @param outputStream output-stream.
+     * Set the object output stream to communicate with the server.
+     * @param outputStream The output stream.
      */
     public void setObjectOutputStream(ObjectOutputStream outputStream) {
         this.objectOutputStream = outputStream;
     }
 
     /**
-     * Initialize default shape-properties and subscribe to observables from the menu.
-     * @param menu menu.
+     * Initialize default shape properties and subscribe to observables from the menu.
+     * @param menu The menu for controlling drawing options.
      */
     private void initializeProperties(Menu menu) {
         currentColor = Constants.COLOR_RED;
@@ -63,6 +62,9 @@ public class DrawingPanel extends JPanel {
         currentShape = createShape(lastSelectedShape);
         drawing = new Drawing();
         startPoint = new Point(0, 0);
+
+        // Subscribe to the shapeSubject.
+        Disposable shapeSubscription = shapeSubject.subscribe(this::handleShapeEvent);
 
         // Subscribe to color, thickness, option, and shape observables
         Disposable colorDisposable = menu.getColorObservable().subscribe(this::updateColor);
@@ -81,14 +83,53 @@ public class DrawingPanel extends JPanel {
      * Initialize mouse-events.
      */
     private void initializeMouseEvents() {
-        // Subscribe to the corresponding observables, and handle the event.
-        Disposable mousePressDisposable = createMousePressObservable().subscribe(this::handleMousePress);
-        Disposable mouseDragDisposable = createMouseDragObservable().subscribe(this::handleMouseDrag);
-        Disposable mouseReleaseDisposable = createMouseReleaseObservable().subscribe(this::handleMouseRelease);
+        Disposable dp = createMouseEventObservable()
+                .subscribe(event -> {
+                    if (event.getID() == MouseEvent.MOUSE_PRESSED) {
+                        handleMousePress(event);
+                    } else if (event.getID() == MouseEvent.MOUSE_DRAGGED) {
+                        handleMouseDrag(event);
+                    } else if (event.getID() == MouseEvent.MOUSE_RELEASED) {
+                        handleMouseRelease(event);
+                    }
+                });
     }
 
     /**
-     * Create shape based on provided ShapeType.
+     * Create custom-observables for mouse-events, and attach the mouse-listeners to the panel.
+     * @return Observable that emits mouse-events.
+     */
+    private Observable<MouseEvent> createMouseEventObservable() {
+        return Observable.create(emitter -> {
+            MouseAdapter listener = new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    emitter.onNext(e);
+                }
+
+                @Override
+                public void mouseDragged(MouseEvent e) {
+                    emitter.onNext(e);
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    emitter.onNext(e);
+                }
+            };
+
+            addMouseListener(listener);
+            addMouseMotionListener(listener);
+
+            emitter.setCancellable(() -> {
+                removeMouseListener(listener);
+                removeMouseMotionListener(listener);
+            });
+        });
+    }
+
+    /**
+     * Create a shape based on provided ShapeType.
      * @param shapeType shape-type.
      * @return corresponding shape-object.
      */
@@ -123,16 +164,31 @@ public class DrawingPanel extends JPanel {
      */
     private void handleOptions(String option){
         if (option.equals("Clear")){
-            // Create a Clear-object, send it to the server and clear the canvas.
+            // Create a Clear-object, emit it to shapeSubject and clear the canvas.
             Clear clearShape = new Clear(Color.WHITE, 0);
             shapeSubject.onNext(clearShape);
-            sendShapeToServer(clearShape);
             clearShapes();
         }
     }
 
     /**
-     * Add shape to drawing.
+     * Send the provided shape to the server.
+     * @param shape shape to send.
+     */
+    private void handleShapeEvent(Shape shape){
+        if (objectOutputStream != null && shape != null) {
+            try {
+                // Send the shape through output-stream.
+                objectOutputStream.writeObject(shape);
+                objectOutputStream.reset();  // Reset the stream after sending shape.
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Add shape to Drawing.
      * @param shape shape to be added.
      */
     public void addShape(Shape shape){
@@ -184,9 +240,6 @@ public class DrawingPanel extends JPanel {
         currentShape.setPosition(startX, startY);
         drawing.addShape(currentShape);
 
-        // Publish the shape to the subject
-        shapeSubject.onNext(currentShape);
-
     }
 
     /**
@@ -229,91 +282,13 @@ public class DrawingPanel extends JPanel {
     }
 
     /**
-     * When mouse is being released, send the final shape to the server.
+     * When mouse is being released, emit the final shape to shapeSubject.
      * @param event mouse-release.
      */
     private void handleMouseRelease(MouseEvent event) {
-        sendShapeToServer(currentShape);
+        shapeSubject.onNext(currentShape);
     }
 
-    /**
-     * Send the shape to the server.
-     * @param shape final drawn shape.
-     */
-    private void sendShapeToServer(Shape shape) {
-        if (objectOutputStream != null && shape != null) {
-            try {
-                // Send the shape through output-stream.
-                objectOutputStream.writeObject(shape);
-                objectOutputStream.reset();  // Reset the stream after sending shape.
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /**
-     * Attach a mouse-pressed listener and emit the MouseEvent object.
-     * @return custom observable for mouse-press.
-     */
-    private Observable<MouseEvent> createMousePressObservable() {
-        return Observable.create(emitter -> {
-            MouseAdapter listener = new MouseAdapter() {
-                @Override
-                public void mousePressed(MouseEvent e) {
-                    // Emit the mouse press event
-                    emitter.onNext(e);
-                }
-            };
-
-            addMouseListener(listener);
-
-            // Cleanup when the observable is disposed.
-            emitter.setCancellable(() -> removeMouseListener(listener));
-        });
-    }
-
-    /**
-     * Attach a mouse-drag listener and emit the MouseEvent object.
-     * @return custom observable for mouse-drag.
-     */
-    private Observable<MouseEvent> createMouseDragObservable() {
-        return Observable.create(emitter -> {
-            MouseAdapter listener = new MouseAdapter() {
-                @Override
-                public void mouseDragged(MouseEvent e) {
-                    // Emit the mouse drag event
-                    emitter.onNext(e);
-                }
-            };
-
-            addMouseMotionListener(listener);
-
-            // Cleanup when the observable is disposed.
-            emitter.setCancellable(() -> removeMouseMotionListener(listener));
-        });
-    }
-
-    /**
-     * Attach a mouse-release listener and emit the MouseEvent object.
-     * @return custom observable for mouse-release.
-     */
-    private Observable<MouseEvent> createMouseReleaseObservable() {
-        return Observable.create(emitter -> {
-            MouseAdapter listener = new MouseAdapter() {
-                @Override
-                public void mouseReleased(MouseEvent e) {
-                    // Emit the mouse release event
-                    emitter.onNext(e);
-                }
-            };
-
-            addMouseListener(listener);
-
-            // Cleanup when the observable is disposed.
-            emitter.setCancellable(() -> removeMouseListener(listener));
-        });
-    }
 
     /**
      * Draw the shapes using drawing-class.
@@ -328,7 +303,7 @@ public class DrawingPanel extends JPanel {
     }
 
     /**
-     * Get output-stream.
+     * Get the output-stream.
      * @return output-stream.
      */
     public ObjectOutputStream getObjectOutputStream(){

@@ -12,7 +12,7 @@ import java.awt.*;
 
 
 /**
- * Menu.
+ * The menu for selecting shape, color, thickness, and options.
  * @author 	Ebba Nimér
  */
 public class Menu extends JMenuBar {
@@ -25,7 +25,7 @@ public class Menu extends JMenuBar {
     private Observable<ShapeType> shapeObservable;
 
     /**
-     * Set up menus.
+     * Sets up the menus.
      */
     public Menu() {
         setOptionsMenu();
@@ -35,7 +35,7 @@ public class Menu extends JMenuBar {
     }
 
     /**
-     * Set up options-menu.
+     * Sets up options-menu.
      */
     private void setOptionsMenu(){
 
@@ -52,7 +52,7 @@ public class Menu extends JMenuBar {
     }
 
     /**
-     * Get the options-observable.
+     * Gets the options-observable.
      * @return Observable with option.
      */
     public Observable<String> getOptionObservable(){
@@ -60,7 +60,7 @@ public class Menu extends JMenuBar {
     }
 
     /**
-     * Set up shape-menu.
+     * Sets up the shape-menu.
      */
     private void setShapeMenu(){
 
@@ -87,7 +87,7 @@ public class Menu extends JMenuBar {
     }
 
     /**
-     * Get the shape-observable.
+     * Gets the shape-observable.
      * @return Observable with ShapeType.
      */
     public Observable<ShapeType> getShapeObservable(){
@@ -95,7 +95,7 @@ public class Menu extends JMenuBar {
     }
 
     /**
-     * Set up the color-menu.
+     * Sets up the color-menu.
      */
     private void setColorMenu(){
 
@@ -119,7 +119,7 @@ public class Menu extends JMenuBar {
     }
 
     /**
-     * Get the color-observable.
+     * Gets the color-observable.
      * @return Observable with Color.
      */
     public Observable<Color> getColorObservable() {
@@ -127,7 +127,7 @@ public class Menu extends JMenuBar {
     }
 
     /**
-     * Set up the thickness-menu.
+     * Sets up the thickness-menu.
      */
     private void setThicknessMenu(){
 
@@ -152,7 +152,7 @@ public class Menu extends JMenuBar {
     }
 
     /**
-     * Get the thickness-observable.
+     * Gets the thickness-observable.
      * @return Observable with thickness.
      */
     public Observable<Integer> getThicknessObservable() {

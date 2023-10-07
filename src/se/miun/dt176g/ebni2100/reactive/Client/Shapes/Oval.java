@@ -5,10 +5,16 @@ import se.miun.dt176g.ebni2100.reactive.Client.Shape;
 import java.awt.*;
 
 /**
- * Class representing the shape Oval.
+ * Class representing an oval shape. Extends Shape.
  */
 public class Oval extends Shape {
 
+    /**
+     * Initializes an oval shape with the given color and thickness.
+     *
+     * @param color Color of the shape.
+     * @param thickness Thickness of the shape's outline.
+     */
     public Oval(Color color, int thickness) {
         super(color, thickness);
     }

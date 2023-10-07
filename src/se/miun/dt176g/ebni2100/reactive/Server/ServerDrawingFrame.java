@@ -8,16 +8,23 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents the main frame for the server-side drawing application.
+ * Displays incoming shapes received from connected clients.
+ */
 public class ServerDrawingFrame extends JFrame {
 
+    // List to store incoming shapes from connected clients
     private List<Shape> incomingShapes = new ArrayList<>();
     private final JPanel shapeDisplayPanel;
 
+    /**
+     * Initializes the server drawing frame.
+     * Sets up the frame properties and creates a custom panel for shape display.
+     */
     public ServerDrawingFrame() {
         setTitle("Server Drawing");
-        // default window-size.
         this.setSize(1000, 800);
-        // application closes when the "x" in the upper-right corner is clicked.
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Create a custom panel to display shapes
@@ -35,11 +42,13 @@ public class ServerDrawingFrame extends JFrame {
         this.getContentPane().add(shapeDisplayPanel, BorderLayout.CENTER);
     }
 
-    // Inside the updateIncomingShapes method
+    /**
+     * Updates the list of incoming shapes and triggers a repaint of the shape display panel.
+     * @param shapes List of incoming shapes received from connected clients.
+     */
     public void updateIncomingShapes(List<Shape> shapes) {
         incomingShapes = shapes;
         shapeDisplayPanel.repaint();
-        // Additionally, revalidate the panel to ensure proper resizing
         shapeDisplayPanel.revalidate();
     }
 

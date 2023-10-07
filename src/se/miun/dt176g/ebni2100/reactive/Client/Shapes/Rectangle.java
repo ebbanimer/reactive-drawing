@@ -6,10 +6,16 @@ import java.awt.*;
 
 
 /**
- * Represents the rectangle shape.
+ * Represents the rectangle shape. Extends shape.
  */
 public class Rectangle extends Shape {
 
+    /**
+     * Initializes a rectangle shape with the given color and thickness.
+     *
+     * @param color Color of the shape.
+     * @param thickness Thickness of the shape's outline.
+     */
     public Rectangle(Color color, int thickness) {
         super(color, thickness);
     }

@@ -30,10 +30,9 @@ public class MainFrame extends JFrame {
     private DrawingPanel drawingPanel;
     private Socket serverSocket;
     private ObjectInputStream objectInputStream;
-    private final ExecutorService inputStreamExecutor = Executors.newSingleThreadExecutor();
 
     /**
-     * Initialize the frame-layout and server-connection.
+     * Initialize the frame layout and server connection.
      */
     public MainFrame() {
         initializeFrame();
@@ -41,7 +40,7 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * Initialize layout.
+     * Initialize the layout of the frame.
      */
     private void initializeFrame() {
         this.setSize(1000, 800);
@@ -49,6 +48,7 @@ public class MainFrame extends JFrame {
         this.setTitle(HEADER);
         this.setLayout(new BorderLayout());
 
+        // Add an exit-window listener to shut down application.
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -58,7 +58,7 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * Display connect-panel with connect-button, with event-listener.
+     * Display a connect panel with a connect button and an event listener.
      */
     private void connectToServer() {
         JButton connectButton = new JButton("Connect to Server");
@@ -71,8 +71,8 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * If socket is yet not initialized, establish a connection to the server.
-     * @param connectPanel connect-panel.
+     * If the socket is not initialized, establish a connection to the server.
+     * @param connectPanel The connect panel.
      */
     private void handleConnectButtonClick(JPanel connectPanel) {
         if (serverSocket == null || serverSocket.isClosed()) {
@@ -88,43 +88,43 @@ public class MainFrame extends JFrame {
 
     /**
      * Establish the connection to the server.
-     * @param connectPanel connect-panel.
+     * @param connectPanel The connect panel.
      * @throws IOException IO-exception.
      */
     private void establishConnection(JPanel connectPanel) throws IOException {
-        try {
-            // Start a new socket.
-            serverSocket = new Socket("localhost", 12345);
-            JOptionPane.showMessageDialog(this, "Connected to the server!");
+        Disposable dp = Observable.fromCallable(() -> {
+                    // Start a new socket.
+                    serverSocket = new Socket("localhost", 12345);
+                    JOptionPane.showMessageDialog(this, "Connected to the server!");
 
-            // Start a new thread for network operations
-            new Thread(() -> {
-                initializeObjectInputStream();
-                try {
+                    // Initialize streams and subscribe to incoming shapes.
+                    initializeObjectInputStream();
                     subscribeToServerShapes();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }).start();
 
-            // Invoke GUI components on the EDT.
-            SwingUtilities.invokeLater(() -> {
-                this.getContentPane().remove(connectPanel);  // remove connect-panel
-                try {
-                    initializeDrawingPanelAndMenu();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                repaintFrame();
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw e; // rethrow the exception to handle it in the calling method
-        }
+                    // Invoke GUI components on the EDT.
+                    SwingUtilities.invokeLater(() -> {
+                        this.getContentPane().remove(connectPanel);  // remove connect-panel
+                        try {
+                            initializeDrawingPanelAndMenu();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        repaintFrame();
+                    });
+
+                    return true; // Return a result to onComplete.
+                })
+                .subscribeOn(Schedulers.io()) // Perform the work on a background thread.
+                .observeOn(Schedulers.single()) // Observe the result on a single thread (e.g., UI thread).
+                .subscribe(
+                        result -> {}, // onNext not used here.
+                        Throwable::printStackTrace,
+                        () -> {} // onComplete not used here.
+                );
     }
 
     /**
-     * Initialize the object-input-stream for socket, in order to receive shapes from server.
+     * Initialize the object input stream for the socket to receive shapes from the server.
      */
     private void initializeObjectInputStream() {
         try {
@@ -135,7 +135,7 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * Subscribe to the server in order to listen for shapes.
+     * Subscribe to the server to listen for shapes.
      * @throws IOException IO-exception.
      */
     private void subscribeToServerShapes() throws IOException {
@@ -149,7 +149,7 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * Initialize menu and drawing-panel.
+     * Initialize the menu and drawing panel.
      * @throws IOException IO-exception.
      */
     private void initializeDrawingPanelAndMenu() throws IOException {
@@ -164,7 +164,7 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * Initialize object-output-stream to drawing-panel, in order to send shapes to the server.
+     * Initialize the object output stream to the drawing panel to send shapes to the server.
      * @throws IOException IO-exception.
      */
     private void initializeObjectOutputStream() throws IOException {
@@ -172,42 +172,53 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * Create a custom-observable that emits shapes received from the server. Uses ExecutorService to
-     * continuously read shapes in a non-blocking way.
-     * @return observable emitting shapes.
+     * Create a custom observable that emits shapes received from the server.
+     * Uses RxJava operators to handle asynchronous socket communication.
+     * @return Observable emitting shapes.
      */
     private Observable<Shape> createServerShapesObservable() {
+        return Observable.create(emitter -> {
+            // Use subscribeOn to read shapes on a separate thread.
+            Disposable disposable = Observable.fromCallable(() -> {
+                        while (true) {
+                            try {
+                                if (serverSocket.isClosed()) {
+                                    // Socket is closed, complete the observable.
+                                    emitter.onComplete();
+                                    break;
+                                }
 
-        // Open a new thread for continuously reading shapes from the server.
-        return Observable.create(emitter -> inputStreamExecutor.submit(() -> {
-            while (true) {
-                try {
-                    if (serverSocket.isClosed()) {
-                        // Socket is closed, complete the observable.
-                        emitter.onComplete();
-                        break;
-                    }
+                                // Read shape from input-stream.
+                                Shape receivedShape = (Shape) objectInputStream.readObject();
+                                emitter.onNext(receivedShape);  // emit the received shape.
+                            } catch (SocketException | EOFException e) {
+                                // Handle SocketException when the socket is closed
+                                emitter.onComplete();
+                                break;
+                            } // End of stream or if class was not found.
+                            catch (IOException | ClassNotFoundException e) {
+                                e.printStackTrace();
+                                emitter.onError(e);
+                                break;
+                            }
+                        }
+                        return true;
+                    })
+                    .subscribeOn(Schedulers.io()) // Read on IO thread.
+                    .observeOn(Schedulers.single()) // Emit on a single thread (e.g., UI thread).
+                    .subscribe(
+                            result -> {}, // onNext not used here.
+                            emitter::onError, // Pass errors to emitter.
+                            emitter::onComplete // Notify completion.
+                    );
 
-                    // Read shape from input-stream.
-                    Shape receivedShape = (Shape) objectInputStream.readObject();
-                    emitter.onNext(receivedShape);  // emit the received shape.
-                } catch (SocketException | EOFException e) {
-                    // Handle SocketException when the socket is closed
-                    emitter.onComplete();
-                    break;
-                } // End of stream or if class was not found.
-                catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
-                    emitter.onError(e);
-                    break;
-                }
-            }
-        }));
+            emitter.setCancellable(disposable::dispose); // Dispose the subscription on cancellation.
+        });
     }
 
     /**
-     * Handle the received shape by adding it to the drawing-panel (or clear if it was a clear-command).
-     * @param shape shape from server.
+     * Handle the received shape by adding it to the drawing panel (or clear if it was a clear command).
+     * @param shape Shape from the server.
      */
     private void handleReceivedShape(Shape shape) {
         if (shape instanceof Clear){
@@ -219,7 +230,7 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * If error in subscribing to shape-observable.
+     * If there is an error in subscribing to the shape observable.
      */
     private void handleSubscriptionError(Throwable throwable) {
         System.err.println("Error in subscribeToServerShapes: " + throwable.getMessage());
@@ -235,7 +246,7 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * Clean up any resources related to the server connection
+     * Clean up any resources related to the server connection.
      */
     private void handleServerDisconnect() {
         try {
@@ -251,7 +262,7 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * If client exists application, close input- and output-streams and socket-connection.
+     * If the client exits the application, close input and output streams and socket connection.
      */
     private void handleExit() {
         try {

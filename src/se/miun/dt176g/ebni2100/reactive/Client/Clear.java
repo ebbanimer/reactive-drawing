@@ -3,7 +3,7 @@ package se.miun.dt176g.ebni2100.reactive.Client;
 import java.awt.*;
 
 /**
- * Class representing the clear-command.
+ * Class representing the clear-command. Extends shape.
  */
 public class Clear extends Shape {
 
@@ -12,5 +12,7 @@ public class Clear extends Shape {
     }
 
     @Override
-    public void draw(Graphics g) {}
+    public void draw(Graphics g) {
+        // Not needed.
+    }
 }

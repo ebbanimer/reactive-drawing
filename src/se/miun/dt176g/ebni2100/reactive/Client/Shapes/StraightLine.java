@@ -5,12 +5,18 @@ import se.miun.dt176g.ebni2100.reactive.Client.Shape;
 import java.awt.*;
 
 /**
- * Class representing the straight line.
+ * Class representing the straight line. Extends shape.
  */
 public class StraightLine extends Shape {
     private int endX;
     private int endY;
 
+    /**
+     * Initializes a straight-line shape with the given color and thickness.
+     *
+     * @param color Color of the shape.
+     * @param thickness Thickness of the shape's outline.
+     */
     public StraightLine(Color color, int thickness) {
         super(color, thickness);
     }

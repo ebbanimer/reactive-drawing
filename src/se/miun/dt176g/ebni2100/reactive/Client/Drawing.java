@@ -20,7 +20,7 @@ public class Drawing implements Drawable {
     }
 
     /**
-     * Add shape to the list.
+     * Adds a shape to the list.
      * @param s shape.
      */
     public void addShape(Shape s) {
@@ -28,15 +28,16 @@ public class Drawing implements Drawable {
     }
 
     /**
-     * Empty shape-list.
+     * Empties the shape list.
      */
     public void emptyShapes(){
         shapes.clear();
     }
 
     /**
-     * For each shape, call its draw-method.
-     * @param g graphics.
+     * Draws each shape in the list using the provided graphics context.
+     *
+     * @param g graphics context.
      */
     @Override
     public void draw(Graphics g) {

@@ -1,11 +1,15 @@
 package se.miun.dt176g.ebni2100.reactive.Client;
 
 /**
- * @version 1.0
- * @since 	2022-09-08
+ * The Drawable interface represents objects that can be drawn using a Graphics context.
  */
 
 @FunctionalInterface
 interface Drawable {
+    /**
+     * Draws the object using the provided Graphics context.
+     *
+     * @param g Graphics context for drawing.
+     */
     void draw(java.awt.Graphics g);
 }

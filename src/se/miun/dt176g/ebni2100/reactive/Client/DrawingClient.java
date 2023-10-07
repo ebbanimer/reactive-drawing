@@ -3,8 +3,12 @@ import javax.swing.SwingUtilities;
 
 
 /**
- * Client-program.
- * @author  Ebba Nimér
+ * Client program for a drawing application.
+ *
+ * This program initializes and starts the graphical user interface (GUI) on the
+ * event dispatching thread.
+ *
+ * @author Ebba Nimér
  */
 public class DrawingClient {
 

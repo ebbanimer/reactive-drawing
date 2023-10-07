@@ -16,9 +16,11 @@ public class Freehand extends Shape {
     private final List<Point> points;
 
     /**
-     * Initialize shape with given color and thickness, and initialize points.
-     * @param color color of shape.
-     * @param thickness thickness of shape.
+     * Initializes a freehand shape with the given color and thickness.
+     * Initializes the list of points.
+     *
+     * @param color Color of the shape.
+     * @param thickness Thickness of the shape's outline.
      */
     public Freehand(Color color, int thickness) {
         super(color, thickness);
@@ -26,8 +28,9 @@ public class Freehand extends Shape {
     }
 
     /**
-     * Add point to list.
-     * @param point point.
+     * Adds a point to the list of points.
+     *
+     * @param point Point to be added.
      */
     public void addPoint(Point point) {
         points.add(point);
