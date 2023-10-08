@@ -115,11 +115,11 @@ public class MainFrame extends JFrame {
                     return true; // Return a result to onComplete.
                 })
                 .subscribeOn(Schedulers.io()) // Perform the work on a background thread.
-                .observeOn(Schedulers.single()) // Observe the result on a single thread (e.g., UI thread).
+                .observeOn(Schedulers.single()) // Observe the result on a single thread (UI)
                 .subscribe(
-                        result -> {}, // onNext not used here.
+                        result -> {},
                         Throwable::printStackTrace,
-                        () -> {} // onComplete not used here.
+                        () -> {}
                 );
     }
 
@@ -135,7 +135,7 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * Subscribe to the server to listen for shapes.
+     * Subscribe to the observable that emits shapes received from the server.
      * @throws IOException IO-exception.
      */
     private void subscribeToServerShapes() throws IOException {
@@ -173,7 +173,6 @@ public class MainFrame extends JFrame {
 
     /**
      * Create a custom observable that emits shapes received from the server.
-     * Uses RxJava operators to handle asynchronous socket communication.
      * @return Observable emitting shapes.
      */
     private Observable<Shape> createServerShapesObservable() {
@@ -205,7 +204,7 @@ public class MainFrame extends JFrame {
                         return true;
                     })
                     .subscribeOn(Schedulers.io()) // Read on IO thread.
-                    .observeOn(Schedulers.single()) // Emit on a single thread (e.g., UI thread).
+                    .observeOn(Schedulers.single()) // Emit on a single thread (UI)
                     .subscribe(
                             result -> {}, // onNext not used here.
                             emitter::onError, // Pass errors to emitter.

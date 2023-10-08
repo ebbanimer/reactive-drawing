@@ -24,13 +24,11 @@ import se.miun.dt176g.ebni2100.reactive.Client.Shape;
  * Represents the server that facilitates communication between clients, allowing them to share and draw
  * shapes collaboratively.
  *
- * This class initializes a server socket, manages client connections, and
- * handles the communication of shapes between the server and connected clients
- * in a reactive manner using RxJava.
+ * This class initializes a server socket, manages client connections, and handles the communication of
+ * shapes between the server and connected clients.
  *
- * The server maintains a list of shapes received from clients and uses a
- * ReplaySubject to buffer and emit shapes to subscribers. Each connected client has its own output stream
- * to receive shapes from the server.
+ * The server maintains a list of shapes received from clients and uses a ReplaySubject to buffer and emit
+ * shapes to subscribers. Each connected client has its own output stream to receive shapes from the server.
  *
  * It also provides methods to send shapes to clients, observe the stream of
  * shapes, and perform cleanup when clients disconnect.
