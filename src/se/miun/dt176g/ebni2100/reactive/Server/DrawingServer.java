@@ -44,8 +44,12 @@ public class DrawingServer {
     private static final ReplaySubject<Shape> shapesSubject = ReplaySubject.create();
     private static ServerDrawingFrame serverMainFrame;
 
-    // Container holding output-streams to each client.
+    // Containers holding output-streams and disposables to each client.
     private static final ConcurrentMap<Socket, ObjectOutputStream> outputStreams = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<Socket, Disposable> disposableMap = new ConcurrentHashMap<>();
+
+    // Keep track on all disposables.
+    static CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     /**
      * Handles the main logic for client connections, setting up the server socket,
@@ -65,6 +69,12 @@ public class DrawingServer {
 
         // Handle incoming client connections.
         handleClientConnections(serverSocket);
+
+        // Add a shutdown hook to dispose of disposables when the application exits.
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("Shutting down...");
+            compositeDisposable.dispose();
+        }));
 
     }
 
@@ -100,7 +110,7 @@ public class DrawingServer {
                             throwable.printStackTrace();
                         }
                 );
-
+        compositeDisposable.add(dp);
     }
 
     /**
@@ -132,7 +142,7 @@ public class DrawingServer {
                                 cleanupOnClientDisconnect(clientSocket);
                             });
 
-
+            disposableMap.put(clientSocket, dp);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -211,6 +221,11 @@ public class DrawingServer {
      * @param clientSocket The client socket.
      */
     private static void cleanupOnClientDisconnect(Socket clientSocket) {
+        // Dispose of the disposable associated with the clientSocket.
+        Disposable disposable = disposableMap.remove(clientSocket);
+        if (disposable != null && !disposable.isDisposed()) {
+            disposable.dispose();
+        }
         ObjectOutputStream objectOutputStream = outputStreams.remove(clientSocket);
         if (objectOutputStream != null) {
             try {

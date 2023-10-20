@@ -99,13 +99,13 @@ public class MainFrame extends JFrame {
 
                     // Initialize streams and subscribe to incoming shapes.
                     initializeObjectInputStream();
-                    subscribeToServerShapes();
 
                     // Invoke GUI components on the EDT.
                     SwingUtilities.invokeLater(() -> {
                         this.getContentPane().remove(connectPanel);  // remove connect-panel
                         try {
                             initializeDrawingPanelAndMenu();
+                            subscribeToServerShapes();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
